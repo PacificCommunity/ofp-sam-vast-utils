@@ -4,6 +4,12 @@ cache: packages
 env:
   - _R_CHECK_FORCE_SUGGESTS_=false
 
+before_install:
+  -Rscript -e 'install.packages("INLA", repos=c(getOption("repos"), INLA="https://inla.r-inla-download.org/R/stable"), dep=TRUE)'
+  -Rscript -e 'install.packages("devtools")'
+  -Rscript -e 'devtools::install_github("James-Thorson-NOAA/VAST", INSTALL_opts="--no-staged-install")'
+  -Rscript -e 'devtools::install_github("James-Thorson-NOAA/FishStatsUtils", INSTALL_opts="--no-staged-install")'
+
 r_github_packages:
   - James-Thorson-NOAA/VAST
   - James-Thorson-NOAA/FishStatsUtils
