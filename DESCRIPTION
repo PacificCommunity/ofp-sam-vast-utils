@@ -23,7 +23,6 @@ Depends:
 Imports: 
     RANN,
     abind,
-    INLA,
     TMBhelper
 Suggests: 
     testthat (>= 2.1.0),
