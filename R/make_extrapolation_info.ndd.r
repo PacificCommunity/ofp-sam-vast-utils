@@ -16,6 +16,7 @@
 #'   \item{zone}{}
 #'   \item{flip_around_dateline}{}
 #' }
+#' @importFrom rgeos gUnion
 #' @export
 
 make_extrapolation_info.ndd = function(Region,strata.limits,input.grid,crs.en,crs.ll,strata.sp)
@@ -46,12 +47,11 @@ make_extrapolation_info.ndd = function(Region,strata.limits,input.grid,crs.en,cr
   		{
   			a_el = data.frame(All_areas = Area_km2_x)
   		} else {
-  			# load packages
-				library(rgeos,quietly=TRUE)
+  
 			# define union of model region
 				n.substrata = length(strata.sp)
 				full.reg = strata.sp[1]
-				for(i in 2:length(strata.sp)){full.reg = gUnion(full.reg,strata.sp[i])}
+				for(i in 2:length(strata.sp)){full.reg = rgeos::gUnion(full.reg,strata.sp[i])}
 				strata.sp = rbind(full.reg,strata.sp)
 				new_IDs = c("all.strata",paste0("sub.strata.",1:n.substrata))
 				for (i in 1:length(slot(strata.sp, "polygons")))

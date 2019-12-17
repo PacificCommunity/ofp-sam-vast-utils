@@ -7,6 +7,11 @@
 #' @param vertices Number of vertices in buffer
 #' @param k Degree of smoothness of buffer, bigger number more smooth (?)
 #' @return A spatial polygon object
+#' @importFrom sp Polygon
+#' @importFrom sp Polygons
+#' @importFrom sp SpatialPolygons
+#' @importFrom sp proj4string
+#' @importFrom rgeos gBuffer
 #' @export
 
 smooth.hull.sp = function(pts,crs.ll,buffer.ll,vertices = 100, k=3)
@@ -15,9 +20,6 @@ smooth.hull.sp = function(pts,crs.ll,buffer.ll,vertices = 100, k=3)
 # https://stackoverflow.com/questions/42630703/create-buffer-around-spatial-data-in-r/42641283
 # https://stackoverflow.com/questions/13577918/plotting-a-curve-around-a-set-of-points
 {
-	library(sp,quietly=TRUE)
-	library(rgeos,quietly=TRUE)
-
 	xy = as.matrix(as.data.frame(lapply(pts,"[",chull(pts)))) 
  	# Wrap k vertices around each end.
     n <- dim(xy)[1]
@@ -37,10 +39,10 @@ smooth.hull.sp = function(pts,crs.ll,buffer.ll,vertices = 100, k=3)
     smooth = cbind(x1, x2)[k < x & x <= n+k, ]
     smooth = rbind(smooth,smooth[1,])
 
-	p = Polygon(smooth)
-	ps = Polygons(list(p),1)
-	sps = SpatialPolygons(list(ps))
-	proj4string(sps) = crs.ll
-	buff = gBuffer(sps, width=buffer.ll, quadsegs=10)
+	p = sp::Polygon(smooth)
+	ps = sp::Polygons(list(p),1)
+	sps = sp::SpatialPolygons(list(ps))
+	sp::proj4string(sps) = crs.ll
+	buff = rgeos::gBuffer(sps, width=buffer.ll, quadsegs=10)
 	return(buff)
 }

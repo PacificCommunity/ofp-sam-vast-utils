@@ -1,10 +1,14 @@
 #' Is exactly the same as JT FishStatUtils function except it added `colnames(DF_ip) = c(names(sample_data),covariate_names)` to correct column mismatch
+#' This issue has been raised with JT and should be corrected in the next merge of the FishStatUtils dev branch
 #' @param formula Formula for the covariates
 #' @param covariate_data Data frame containing the covariates
 #' @param Year_i Vector of year of every observation
 #' @param spatial_list spatial_list produced by \code{make_spatial_info.ndd}
 #' @param extrapolation_list extrapolation_list produced by \code{make_extrapolation_info.ndd}
 #' @return returns a tagged list used in other functions
+#' @importFrom RANN nn2
+#' @importFrom abind abind
+
 
 #' @export
 

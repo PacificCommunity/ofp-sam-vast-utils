@@ -20,6 +20,8 @@
 #' @param crs.en Character string of the crs for the E-N projection
 #' @param crs.ll Character string of the crs for the current lat-lon projections
 #' @param ... additional arguments passed to \code{INLA::inla.mesh.create}
+#' @importFrom RANN nn2
+#' @importFrom INLA inla.spde.make.A
 
 #' @return Tagged list containing objects for running a VAST model
 #' \describe{

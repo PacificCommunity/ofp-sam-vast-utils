@@ -2,7 +2,8 @@
 % Please edit documentation in R/make_covariates.ndd.r
 \name{make_covariates.ndd}
 \alias{make_covariates.ndd}
-\title{Is exactly the same as JT FishStatUtils function except it added `colnames(DF_ip) = c(names(sample_data),covariate_names)` to correct column mismatch}
+\title{Is exactly the same as JT FishStatUtils function except it added `colnames(DF_ip) = c(names(sample_data),covariate_names)` to correct column mismatch
+This issue has been raised with JT and should be corrected in the next merge of the FishStatUtils dev branch}
 \usage{
 make_covariates.ndd(
   formula = ~0,
@@ -28,4 +29,5 @@ returns a tagged list used in other functions
 }
 \description{
 Is exactly the same as JT FishStatUtils function except it added `colnames(DF_ip) = c(names(sample_data),covariate_names)` to correct column mismatch
+This issue has been raised with JT and should be corrected in the next merge of the FishStatUtils dev branch
 }

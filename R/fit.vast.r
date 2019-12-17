@@ -51,6 +51,16 @@
 #'  \item{MapDetails_List}{the map details to make additional plots}
 #' }
 #' @export
+#' @import splines
+#' @importFrom sp coordinates
+#' @importFrom sp proj4string
+#' @importFrom sp over
+#' @importFrom sp spTransform
+#' @importFrom FishStatsUtils make_map_info
+#' @importFrom FishStatsUtils plot_data
+#' @importFrom VAST make_data
+#' @importFrom VAST make_model
+#' @importFrom TMBhelper fit_tmb
 
 
 ### Function defaults for testing 
@@ -75,14 +85,8 @@ fit.vast = function(Data_Geostat,RunDir,SaveDir,SourceDir,Q_ik = NULL,vf.re = FA
 {
 	A = proc.time()
 
-	library(TMB)
-	library(VAST)
-	library(FishStatsUtils)
-	library(data.table)
-	library(sp)
-	source(paste0(SourceDir,"ndd.VAST.utils.r"))
-
 	if(!dir.exists(RunDir)){dir.create(RunDir, recursive = TRUE)}
+		origwd = getwd()
 		setwd(RunDir)
 	if(!dir.exists(SaveDir)){dir.create(SaveDir, recursive = TRUE)}
 
@@ -119,19 +123,19 @@ fit.vast = function(Data_Geostat,RunDir,SaveDir,SourceDir,Q_ik = NULL,vf.re = FA
 		# punch-out all extrapolation grid cells that are on land and outside of "data region"
 			smooth.hull = smooth.hull.sp(Data_Geostat[,c("Lon","Lat")],crs.ll=crs.ll,buffer.ll=2.5,vertices = 45, k=5)
 			extrap.df = as.data.frame(Extrapolation_List$Data_Extrap)
-			coordinates(extrap.df) = ~E_km + N_km
-			proj4string(extrap.df) = crs.en
+			sp::coordinates(extrap.df) = ~E_km + N_km
+			sp::proj4string(extrap.df) = crs.en
 			# plot(smooth.hull)
 
 		# find overlap with land
 		# load land shape file
 			load(paste0(SourceDir,"pacific.coast.RData"))
-			pacific.coast = spTransform(pacific.coast,crs.en)
-			over.index.land = which(is.na(over(extrap.df,pacific.coast)))
+			pacific.coast = sp::spTransform(pacific.coast,crs.en)
+			over.index.land = which(is.na(sp::over(extrap.df,pacific.coast)))
 		# find overlap with data hull
-			smooth.hull.trans = spTransform(smooth.hull,crs.en)
+			smooth.hull.trans = sp::spTransform(smooth.hull,crs.en)
 		# identify number of extrapolation cells (within data hull and not on land) corresponding to each knot
-			over.index.region = which(!is.na(over(extrap.df,smooth.hull.trans)))
+			over.index.region = which(!is.na(sp::over(extrap.df,smooth.hull.trans)))
 			over.index = intersect(over.index.land,over.index.region)
 
 		# modify Extrapolation_List
@@ -149,10 +153,10 @@ fit.vast = function(Data_Geostat,RunDir,SaveDir,SourceDir,Q_ik = NULL,vf.re = FA
 			Data_Geostat = cbind(Data_Geostat, knot_i = Spatial_List$knot_i)
 
 		# plot spatial domain of the model
-			MapDetails_List = make_map_info( "Region"=Region, "NN_Extrap"=Spatial_List$PolygonList$NN_Extrap, 
+			MapDetails_List = FishStatsUtils::make_map_info( "Region"=Region, "NN_Extrap"=Spatial_List$PolygonList$NN_Extrap, 
 			"spatial_list"=Spatial_List, "Extrapolation_List"=Extrapolation_List )
 
-			plot_data(Extrapolation_List, Spatial_List, Data_Geostat = Data_Geostat, PlotDir = SaveDir)
+			FishStatsUtils::plot_data(Extrapolation_List, Spatial_List, Data_Geostat = Data_Geostat, PlotDir = SaveDir)
 
 		# allow for environmental covariates
 			if(missing(enviro))
@@ -160,21 +164,20 @@ fit.vast = function(Data_Geostat,RunDir,SaveDir,SourceDir,Q_ik = NULL,vf.re = FA
 	  			X_gtp = NULL
 	  			X_itp = NULL
 	  		} else {
-	  			library(splines)
 	  			enviro.format = make_covariates.ndd(formula = as.formula(enviro[["formula"]]),covariate_data=enviro[["covariate_data"]], Year_i=Data_Geostat[,'Year'], spatial_list=Spatial_List, extrapolation_list=Extrapolation_List)
 	  			X_gtp = enviro.format$X_gtp
 	  			X_itp = enviro.format$X_itp
 	  		}
 
 		# run the model
-			TmbData = make_data("Version"=Version, "FieldConfig"=FieldConfig, "OverdispersionConfig"=OverdispersionConfig, 
+			TmbData = VAST::make_data("Version"=Version, "FieldConfig"=FieldConfig, "OverdispersionConfig"=OverdispersionConfig, 
 							"RhoConfig"=RhoConfig, "ObsModel_ez"=ObsModel_ez, 
 							"c_iz"=as.numeric(Data_Geostat[,'Spp'])-1, "b_i"=Data_Geostat[,'Response_variable'], 
 							"a_i"=Data_Geostat[,'AreaSwept_km2'], "v_i"=v_i, "Q_ik" = Q_ik, "X_gtp" = X_gtp, "X_itp" = X_itp,
 							"t_iz"=Data_Geostat[,'Year'], 
 							"Options"=Options, "spatial_list" = Spatial_List )
 
-			TmbList = make_model("TmbData"=TmbData, "RunDir"=RunDir, "Version"=Version, "RhoConfig"=RhoConfig, "loc_x"=Spatial_List$loc_x, "Method"=Spatial_List$Method)
+			TmbList = VAST::make_model("TmbData"=TmbData, "RunDir"=RunDir, "Version"=Version, "RhoConfig"=RhoConfig, "loc_x"=Spatial_List$loc_x, "Method"=Spatial_List$Method)
 
 		# Check parameters
 			Obj = TmbList[["Obj"]]
@@ -190,5 +193,7 @@ fit.vast = function(Data_Geostat,RunDir,SaveDir,SourceDir,Q_ik = NULL,vf.re = FA
 
 			vast_output = list( "Opt"=Opt, "Report"=Report, "TmbData"=TmbData, "Extrapolation_List"=Extrapolation_List, "fit.time"=fit.time,"MapDetails_List"=MapDetails_List )
 			save(vast_output,file=paste0(SaveDir,"vast_output.RData"))
+			setwd(origwd)
+
 		return(vast_output)
 }

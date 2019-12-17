@@ -12,18 +12,19 @@ Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.0.2
 Depends:
-	R (>= 3.6.1), 
+	R (>= 3.6.1) 
+Imports:
     rgeos,
     sp,
     rgdal,
     TMB,
     VAST,
     FishStatsUtils,
-    data.table
-Imports: 
     RANN,
     abind,
-    TMBhelper
+    TMBhelper,
+    INLA,
+    splines
 Suggests: 
     testthat (>= 2.1.0),
     roxygen2
