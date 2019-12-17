@@ -1,4 +1,13 @@
 
+#' Calculate a smooth hull around a set of points
+#' 
+#' @param pts List/Data Frame with two entries: one for x and one for y
+#' @param crs.ll Character string of the crs for the current lat-lon projections
+#' @param buffer.ll Size of buffer in degrees of lat/lon
+#' @param vertices Number of vertices in buffer
+#' @param k Degree of smoothness of buffer, bigger number more smooth (?)
+#' @return A spatial polygon object
+#' @export
 
 smooth.hull.sp = function(pts,crs.ll,buffer.ll,vertices = 100, k=3)
 # pts is a list

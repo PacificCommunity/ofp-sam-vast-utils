@@ -1,7 +1,15 @@
+#' Is exactly the same as JT FishStatUtils function except it added `colnames(DF_ip) = c(names(sample_data),covariate_names)` to correct column mismatch
+#' @param formula
+#' @param covariate_data
+#' @param Year_i
+#' @param spatial_list
+#' @param extrapolation_list
+#' @return returns a tagged list used in other functions
+
+#' @export
 
 
 make_covariates.ndd = function( formula=~0, covariate_data, Year_i, spatial_list, extrapolation_list ){
-# added `colnames(DF_ip) = c(names(sample_data),covariate_names)` to correct column mismatch
   # Errors
   if( !is.data.frame(covariate_data) ) stop("Please ensure that `covariate_data` is a data frame")
   if( !all(c("Lat","Lon","Year") %in% names(covariate_data)) ){

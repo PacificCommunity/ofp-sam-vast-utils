@@ -1,4 +1,12 @@
 
+#' Function to convert points stored as eastings and northings to lat-lon
+#' 
+#' @param E Vector of eastings
+#' @param N Vector of northings
+#' @param crs.en Character string of the crs for the E-N projection
+#' @param crs.ll Character string of the crs for the current lat-lon projections
+#' @return Matrix of two columns: Lon and Lat
+#' @export
 
 Convert_EN_to_LL_Fn.ndd = function(E, N, crs.en = "+proj=tpeqd +lat_1=0 +lon_1=155 +lat_2=0 +lon_2=209 +datum=WGS84 +ellps=WGS84 +units=km +no_defs",crs.ll = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0")
 # modified from Jim Thorson's FishStatUtils::Convert_LL_to_EastNorth_Fn.R

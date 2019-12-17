@@ -1,30 +1,77 @@
 
 
-# Nicholas Ducharme-Barth
-# 10/12/2019
-# fit VAST model
-# compatible with VAST v8_3_0 through 16/12/2019
+#' Fits a VAST model, compatible with VAST v8_3_0 through 16/12/2019
+#' Some of the descriptions come from JT VAST package descriptions
+#' 
+#' @param Data_Geostat A data-frame of i rows containing the following columns: Response_variable, Year, Lon, Lat, Spp, AreaSwept_km2, Vessel
+#' @param RunDir Path to the directory where the .cpp VAST source code is stored or compiled
+#' @param SaveDir Path to the directory where the outputs will be saved
+#' @param SourceDir Possibly obsolete: Path to ndd.vast.utils script that stores necessary helper functions 
+#' @param Q_ik Matrix or i rows and k covariates impacting catchability. Can be created using \code{stats::model.matrix}
+#' @param vf.re TRUE or FALSE switch indicating if vessel random effects are to be estimated. If so then the Vessel column in Data_Geostat is used
+#' @param FieldConfig Controls the number of factors estimated with the spatial and spatiotemporal random fields. default setting = c(Omega1 = 1, Epsilon1 = 1, Omega2 = 1, Epsilon2 = 1)
+#' @param RhoConfig Controls the temporal structure of the annual intercepts and the spatiotemporal random field. default setting = c(Beta1 = 0, Beta2 = 0, Epsilon1 = 0, Epsilon2 = 0)
+#' @param ObsModel_ez Controls the error structure. default setting = c(1,3)
+#' \describe{
+#'   \item{ObsModel_ez[e,1]=0}{Normal}
+#'   \item{ObsModel_ez[e,1]=1}{Lognormal}
+#'   \item{ObsModel_ez[e,1]=2}{Gamma}
+#'   \item{ObsModel_ez[e,1]=3}{Inverse-Gaussian}
+#'   \item{ObsModel_ez[e,1]=5}{Negative binomial}
+#'   \item{ObsModel_ez[e,1]=6}{Conway-Maxwell-Poisson (likely to be very slow)}
+#'   \item{ObsModel_ez[e,1]=7}{Poisson (more numerically stable than negative-binomial)}
+#'   \item{ObsModel_ez[e,1]=8}{Compound-Poisson-Gamma, where the expected number of individuals is the 1st-component, the expected biomass per individual is the 2nd-component, and SigmaM is the variance in positive catches (likely to be very slow)}
+#'   \item{ObsModel_ez[e,1]=9}{Binned-Poisson (for use with REEF data, where 0=0 individual; 1=1 individual; 2=2:10 individuals; 3=>10 individuals)}
+#'   \item{ObsModel_ez[e,1]=10}{Tweedie distribution, where epected biomass (lambda) is the product of 1st-component and 2nd-component, variance scalar (phi) is the 1st component, and logis-SigmaM is the power}
+#'   \item{ObsModel_ez[e,1]=11}{Zero-inflated Poisson with additional normally-distributed variation overdispersion in the log-intensity of the Poisson distribution}
+#'   \item{ObsModel_ez[e,1]=12}{Poisson distribution (not zero-inflated) with log-intensity from the 1st linear predictor, to be used in combination with the Poisson-link delta model for combining multiple data types}
+#'   \item{ObsModel_ez[e,1]=13}{Bernoilli distribution using complementary log-log (cloglog) link from the 1st linear predictor, to be used in combination with the Poisson-link delta model for combining multiple data types}
+#'   \item{ObsModel_ez[e,1]=14}{Similar to 12, but also including lognormal overdispersion}
+#'   \item{ObsModel_ez[e,2]=0}{Conventional delta-model using logit-link for encounter probability and log-link for positive catch rates}
+#'   \item{ObsModel_ez[e,2]=1}{Alternative "Poisson-link delta-model" using log-link for numbers-density and log-link for biomass per number}
+#'   \item{ObsModel_ez[e,2]=2}{Link function for Tweedie distribution, necessary for \code{ObsModel_ez[e,1]=8} or \code{ObsModel_ez[e,1]=10}}
+#'   \item{ObsModel_ez[e,2]=3}{Conventional delta-model, but fixing encounter probability=1 for any year where all samples encounter the species}
+#'   \item{ObsModel_ez[e,2]=4}{Poisson-link delta-model, but fixing encounter probability=1 for any year where all samples encounter the species and encounter probability=0 for any year where no samples encounter the species}
+#' }
+#' @param fine_scale TRUE or FALSE. Better maps and slightly better index fit when TRUE but is slower.
+#' @param input.grid.res Resolution of extrapolation grid in kilometers. d
+#' @param knot_method knot_method whether to determine location of GMRF vertices based on the location of samples \code{knot_method=`samples`} or extrapolation-grid cells within the specified strata \code{knot_method='grid'}
+#' @param n_x Number of knots
+#' @param Version Version of VAST to use. Compatible with version "VAST_v8_3_0"
+#' @param Method Method to use for defining spatial field. default setting = "Mesh"
+#' @param strata.sp [Optional] If present, a shapefile containing the strata boundaries to calculate the indicies for
+#' @param enviro [Optional] If present, a named-list of length two is required: "formula" is a character string that can be coerced to a formula using \code{stats::as.formula}, and "covariate_data" is a data frame with the following columns - Year, Lon, Lat, covariates...
+#' @return Named list "vast_output"
+#' \describe{
+#'	\item{Opt}{the diagnostics from the model run}
+#'  \item{Report}{the objects estimated and calculated by VAST}
+#'  \item{TmbData}{the data passed to TMB and used to fit the model}
+#'  \item{Extrapolation_List}{the extrapolation list}
+#'  \item{fit.time}{the time to run the function}
+#'  \item{MapDetails_List}{the map details to make additional plots}
+#' }
+#' @export
 
+
+### Function defaults for testing 
 # RunDir = "C:/Users/nicholasd/HOME/SPC/SPC_SAM/Geostats/2019_SKJ_manuscript/VAST/model_runs/"
 # SaveDir = "C:/Users/nicholasd/HOME/SPC/SPC_SAM/Geostats/2019_SKJ_manuscript/VAST/model_runs/"
 # SourceDir = "C:/Users/nicholasd/HOME/SPC/SPC_SAM/Geostats/2019_SKJ_manuscript/VAST/" 
 # Q_ik = NULL
 # vf.re = FALSE
-# enviro = 0
 # FieldConfig=c(Omega1 = 1, Epsilon1 = 1, Omega2 = 1, Epsilon2 = 1)
 # RhoConfig=c(Beta1 = 0, Beta2 = 0, Epsilon1 = 0, Epsilon2 = 0)
 # ObsModel_ez = c(1,3)
 # fine_scale=TRUE
 # input.grid.res=1
-# knot.config = 1
+# knot_method = "grid"
 # n_x=100
-# grid_size_km=100
 # Version="VAST_v8_3_0"
 # Method="Mesh"
 # strata.sp = skj.alt2019.shp
 # enviro=enviro.a
 
-fit.vast = function(Data_Geostat,RunDir,SaveDir,SourceDir,Q_ik = NULL,vf.re = FALSE,FieldConfig=c(Omega1 = 1, Epsilon1 = 1, Omega2 = 1, Epsilon2 = 1),RhoConfig=c(Beta1 = 0, Beta2 = 0, Epsilon1 = 0, Epsilon2 = 0),ObsModel_ez = c(1,3),fine_scale=TRUE,input.grid.res=1,knot.config = 1,n_x=100,grid_size_km=100,Version="VAST_v8_3_0",Method="Mesh",strata.sp,enviro)
+fit.vast = function(Data_Geostat,RunDir,SaveDir,SourceDir,Q_ik = NULL,vf.re = FALSE,FieldConfig=c(Omega1 = 1, Epsilon1 = 1, Omega2 = 1, Epsilon2 = 1),RhoConfig=c(Beta1 = 0, Beta2 = 0, Epsilon1 = 0, Epsilon2 = 0),ObsModel_ez = c(1,3),fine_scale=TRUE,input.grid.res=1,knot_method = "grid",n_x=100,Version="VAST_v8_3_0",Method="Mesh",strata.sp,enviro)
 {
 	A = proc.time()
 
