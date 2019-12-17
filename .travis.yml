@@ -1,0 +1,27 @@
+language: r
+cache: packages
+
+r_packages:
+    - rgeos
+    - sp
+    - rgdal
+    - TMB
+    - data.table
+    - RANN
+    - abind
+    - INLA
+
+env:
+  - _R_CHECK_FORCE_SUGGESTS_=false
+
+r_github_packages:
+  - James-Thorson-NOAA/VAST
+  - James-Thorson-NOAA/FishStatsUtils
+  - kaskr/TMB_contrib_R/TMBhelper
+
+warnings_are_errors: false
+
+notifications:
+  email:
+    on_success: change
+    on_failure: change
