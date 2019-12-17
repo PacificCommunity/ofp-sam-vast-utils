@@ -1,9 +1,9 @@
 #' Is exactly the same as JT FishStatUtils function except it added `colnames(DF_ip) = c(names(sample_data),covariate_names)` to correct column mismatch
-#' @param formula
-#' @param covariate_data
-#' @param Year_i
-#' @param spatial_list
-#' @param extrapolation_list
+#' @param formula Formula for the covariates
+#' @param covariate_data Data frame containing the covariates
+#' @param Year_i Vector of year of every observation
+#' @param spatial_list spatial_list produced by \code{make_spatial_info.ndd}
+#' @param extrapolation_list extrapolation_list produced by \code{make_extrapolation_info.ndd}
 #' @return returns a tagged list used in other functions
 
 #' @export

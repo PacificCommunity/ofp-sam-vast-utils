@@ -2,10 +2,9 @@
 #' modified from Jim Thorson's FishStatUtils::Prepare_User_Extrapolation_Data_Fn.R
 #' uses my \code{Convert_EN_to_LL_Fn.ndd} and \code{Convert_LL_to_EastNorth_Fn.ndd} functions
 #' also modifies \code{strata.limits} to match \code{strata.sp} if it is present 
-#' @param Region
-#' @param strata.limits
-#' @param observations_LL
-#' @param input.grid
+#' @param Region user
+#' @param strata.limits data frame with strata limits
+#' @param input.grid user created extrapolation grid
 #' @param crs.en Character string of the crs for the E-N projection
 #' @param crs.ll Character string of the crs for the current lat-lon projections
 #' @param strata.sp [Optional] If present, a shapefile containing the strata boundaries to calculate the indicies for
@@ -19,7 +18,7 @@
 #' }
 #' @export
 
-make_extrapolation_info.ndd = function(Region,strata.limits,observations_LL,input.grid,crs.en,crs.ll,strata.sp)
+make_extrapolation_info.ndd = function(Region,strata.limits,input.grid,crs.en,crs.ll,strata.sp)
 {
 	# define input_grid
 	  	# x.range = floor(range(observations_LL$Lon)/input.grid.res)*input.grid.res
