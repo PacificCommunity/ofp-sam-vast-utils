@@ -1,16 +1,6 @@
 language: r
 cache: packages
 
-r_packages:
-    - rgeos
-    - sp
-    - rgdal
-    - TMB
-    - data.table
-    - RANN
-    - abind
-    - INLA
-
 env:
   - _R_CHECK_FORCE_SUGGESTS_=false
 
