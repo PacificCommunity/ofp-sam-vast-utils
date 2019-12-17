@@ -29,7 +29,8 @@ Suggests:
     testthat (>= 2.1.0),
     roxygen2
 Remotes:
-    james-thorson/FishStatsUtils,
+	James-Thorson-NOAA/VAST,
+    James-Thorson-NOAA/FishStatsUtils,
     kaskr/TMB_contrib_R/TMBhelper
 URL: https://github.com/N-DucharmeBarth/ndd.vast.utils
 BugReports: https://github.com/N-DucharmeBarth/ndd.vast.utils/issues
