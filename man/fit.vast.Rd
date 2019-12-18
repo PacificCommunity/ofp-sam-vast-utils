@@ -9,7 +9,6 @@ fit.vast(
   Data_Geostat,
   RunDir,
   SaveDir,
-  SourceDir,
   Q_ik = NULL,
   vf.re = FALSE,
   FieldConfig = c(Omega1 = 1, Epsilon1 = 1, Omega2 = 1, Epsilon2 = 1),
@@ -31,8 +30,6 @@ fit.vast(
 \item{RunDir}{Path to the directory where the .cpp VAST source code is stored or compiled}
 
 \item{SaveDir}{Path to the directory where the outputs will be saved}
-
-\item{SourceDir}{Possibly obsolete: Path to ndd.vast.utils script that stores necessary helper functions}
 
 \item{Q_ik}{Matrix or i rows and k covariates impacting catchability. Can be created using \code{stats::model.matrix}}
 

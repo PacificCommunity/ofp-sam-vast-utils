@@ -9,5 +9,4 @@
 #'   \item{proj4string}{+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0}
 #' }
 #' @source <https://www.ngdc.noaa.gov/mgg/shorelines/>
-
 "pacific.coast"
