@@ -24,8 +24,7 @@ Imports:
     abind,
     TMBhelper,
     INLA,
-    splines,
-    graphics
+    splines
 Suggests: 
     testthat (>= 2.1.0),
     roxygen2
