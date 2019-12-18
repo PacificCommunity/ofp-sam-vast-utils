@@ -61,7 +61,6 @@
 #' @importFrom VAST make_data
 #' @importFrom VAST make_model
 #' @importFrom TMBhelper fit_tmb
-#' @importFrom graphics plot
 
 
 ### Function defaults for testing 
@@ -158,11 +157,9 @@ fit.vast = function(Data_Geostat,RunDir,SaveDir,SourceDir,Q_ik = NULL,vf.re = FA
 
 			Data_Geostat = cbind(Data_Geostat, knot_i = Spatial_List$knot_i)
 
-		# plot spatial domain of the model
+		# prep info for plotting spatial domain of the model
 			MapDetails_List = FishStatsUtils::make_map_info( "Region"=Region, "NN_Extrap"=Spatial_List$PolygonList$NN_Extrap, 
 			"spatial_list"=Spatial_List, "Extrapolation_List"=Extrapolation_List )
-
-			FishStatsUtils::plot_data(Extrapolation_List, Spatial_List, Data_Geostat = Data_Geostat, PlotDir = SaveDir)
 
 		# allow for environmental covariates
 			if(missing(enviro))

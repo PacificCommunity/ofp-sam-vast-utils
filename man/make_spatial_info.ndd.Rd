@@ -58,15 +58,15 @@ make_spatial_info.ndd(
 
 \item{Save_Results}{TRUE or FALSE to save results \code{FishStatsUtils::Calc_Kmeans}}
 
+\item{LON_intensity}{The longitude of points to define the spatial mesh}
+
+\item{LAT_intensity}{The latitude of points to define the spatial mesh}
+
 \item{crs.en}{Character string of the crs for the E-N projection}
 
 \item{crs.ll}{Character string of the crs for the current lat-lon projections}
 
 \item{...}{additional arguments passed to \code{INLA::inla.mesh.create}}
-
-\item{Lon_intensity}{The longitude of points to define the spatial mesh}
-
-\item{Lat_intensity}{The latitude of points to define the spatial mesh}
 }
 \value{
 Tagged list containing objects for running a VAST model
