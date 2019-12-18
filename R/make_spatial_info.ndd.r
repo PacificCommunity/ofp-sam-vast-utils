@@ -24,8 +24,8 @@
 #' @param nstart Number of starts for kmeans clustering algorithm
 #' @param DirPath Directory path to save results for \code{FishStatsUtils::Calc_Kmeans}
 #' @param Save_Results TRUE or FALSE to save results \code{FishStatsUtils::Calc_Kmeans}
-#' @param Lon_intensity The longitude of points to define the spatial mesh
-#' @param Lat_intensity The latitude of points to define the spatial mesh
+#' @param LON_intensity The longitude of points to define the spatial mesh
+#' @param LAT_intensity The latitude of points to define the spatial mesh
 #' @param ... additional arguments passed to \code{INLA::inla.mesh.create}
 #' @importFrom RANN nn2
 #' @importFrom INLA inla.spde.make.A
