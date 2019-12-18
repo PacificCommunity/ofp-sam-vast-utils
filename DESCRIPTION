@@ -1,5 +1,5 @@
 Package: ndd.vast.utils
-Title: Modifications of VAST and FishStatsUtils functions so that VAST works for the data and applications that I work with.
+Title: Modifications of James-Thorson-NOAA/VAST and James-Thorson-NOAA/FishStatsUtils functions as well as my general utility functions
 Version: 0.0.0.9000
 Authors@R: 
     person(given = "Nicholas",
@@ -7,7 +7,7 @@ Authors@R:
            role = c("aut", "cre"),
            email = "nicholas.ducharmebarth@gmail.com")
 Description: Modifications of James-Thorson-NOAA/VAST and James-Thorson-NOAA/FishStatsUtils functions so that VAST works for the data and applications that I work with.
-License: GPL-3
+License: GPL-3 + file LICENSE
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.0.2
@@ -24,7 +24,8 @@ Imports:
     abind,
     TMBhelper,
     INLA,
-    splines
+    splines,
+    graphics
 Suggests: 
     testthat (>= 2.1.0),
     roxygen2

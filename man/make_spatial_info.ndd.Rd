@@ -2,7 +2,7 @@
 % Please edit documentation in R/make_spatial_info.ndd.r
 \name{make_spatial_info.ndd}
 \alias{make_spatial_info.ndd}
-\title{Build objects related to spatial information, and is exactly the same as JT FishStatUtils function except it uses my \code{Convert_EN_to_LL_Fn.ndd} and \code{Convert_LL_to_EastNorth_Fn.ndd} functions}
+\title{Build objects related to spatial information, and is exactly the same as Jim Thorson's FishStatUtils function except it uses my \code{Convert_EN_to_LL_Fn.ndd} and \code{Convert_LL_to_EastNorth_Fn.ndd} functions}
 \usage{
 make_spatial_info.ndd(
   n_x,
@@ -48,11 +48,25 @@ make_spatial_info.ndd(
 
 \item{Network_sz_LL}{data frame with "parent_s", "child_s", "dist_s", "Lat", "Lon", default=NULL only needed with Method == "Stream_network"}
 
+\item{iter.max}{Iterations for kmeans clustering to determine knot configuration}
+
+\item{randomseed}{Set seed for consistent random number generation}
+
+\item{nstart}{Number of starts for kmeans clustering algorithm}
+
+\item{DirPath}{Directory path to save results for \code{FishStatsUtils::Calc_Kmeans}}
+
+\item{Save_Results}{TRUE or FALSE to save results \code{FishStatsUtils::Calc_Kmeans}}
+
 \item{crs.en}{Character string of the crs for the E-N projection}
 
 \item{crs.ll}{Character string of the crs for the current lat-lon projections}
 
 \item{...}{additional arguments passed to \code{INLA::inla.mesh.create}}
+
+\item{Lon_intensity}{The longitude of points to define the spatial mesh}
+
+\item{Lat_intensity}{The latitude of points to define the spatial mesh}
 }
 \value{
 Tagged list containing objects for running a VAST model
@@ -61,7 +75,7 @@ Tagged list containing objects for running a VAST model
   \item{GridList}{A tagged list with inputs related to the 2D AR1 grid}
   \item{a_xl}{A data frame with areas for each knot and each strattum}
   \item{loc_UTM}{A data frame with the converted UTM coordinates for each sample}
-  \item{Kmeans}{Output from \code{Calc_Kmeans} with knots for a triangulated mesh}
+  \item{Kmeans}{Output from \code{FishStatsUtils::Calc_Kmeans} with knots for a triangulated mesh}
   \item{knot_i}{The knot associated with each sample}
   \item{Method}{The Method input (for archival purposes)}
   \item{loc_x}{The UTM location for each knot}

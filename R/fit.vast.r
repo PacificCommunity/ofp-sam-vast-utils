@@ -61,6 +61,7 @@
 #' @importFrom VAST make_data
 #' @importFrom VAST make_model
 #' @importFrom TMBhelper fit_tmb
+#' @importFrom graphics plot
 
 
 ### Function defaults for testing 
@@ -117,8 +118,13 @@ fit.vast = function(Data_Geostat,RunDir,SaveDir,SourceDir,Q_ik = NULL,vf.re = FA
 			input.grid = as.matrix(expand.grid(Lat = seq(from=grid_bounds[1],to=grid_bounds[2],by=input.grid.res),
 					Lon = seq(from=grid_bounds[3],to=grid_bounds[4],by=input.grid.res), Area_km2 = grid_size_km))
 			crs.en = paste0("+proj=tpeqd +lat_1=",mean(grid_bounds[1:2])," +lon_1=",round(grid_bounds[3] + (1/3)*abs(diff(grid_bounds[3:4])))," +lat_2=",mean(grid_bounds[1:2])," +lon_2=",round(grid_bounds[3] + (2/3)*abs(diff(grid_bounds[3:4])))," +datum=WGS84 +ellps=WGS84 +units=km +no_defs")
-			crs.ll = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0" 			 
-			Extrapolation_List = make_extrapolation_info.ndd(Region = Region,strata.limits = strata.limits,observations_LL = Data_Geostat[,c("Lat","Lon")],input.grid = input.grid, crs.en = crs.en,crs.ll = crs.ll,strata.sp)
+			crs.ll = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0"
+			if(missing(strata.sp))
+			{
+				Extrapolation_List = make_extrapolation_info.ndd(Region = Region,strata.limits = strata.limits,input.grid = input.grid, crs.en = crs.en,crs.ll = crs.ll)
+			} else {
+				Extrapolation_List = make_extrapolation_info.ndd(Region = Region,strata.limits = strata.limits,input.grid = input.grid, crs.en = crs.en,crs.ll = crs.ll,strata.sp)
+			}		 
 
 		# punch-out all extrapolation grid cells that are on land and outside of "data region"
 			smooth.hull = smooth.hull.sp(Data_Geostat[,c("Lon","Lat")],crs.ll=crs.ll,buffer.ll=2.5,vertices = 45, k=5)

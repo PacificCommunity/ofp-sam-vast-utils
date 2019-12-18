@@ -1,5 +1,5 @@
 
-#' Build objects related to spatial information, and is exactly the same as JT FishStatUtils function except it uses my \code{Convert_EN_to_LL_Fn.ndd} and \code{Convert_LL_to_EastNorth_Fn.ndd} functions
+#' Build objects related to spatial information, and is exactly the same as Jim Thorson's FishStatUtils function except it uses my \code{Convert_EN_to_LL_Fn.ndd} and \code{Convert_LL_to_EastNorth_Fn.ndd} functions
 #'
 #' \code{make_spatial_info} builds a tagged list with all the spatial information needed for \code{Data_Fn}
 #'
@@ -19,9 +19,19 @@
 #' @param Network_sz_LL data frame with "parent_s", "child_s", "dist_s", "Lat", "Lon", default=NULL only needed with Method == "Stream_network"
 #' @param crs.en Character string of the crs for the E-N projection
 #' @param crs.ll Character string of the crs for the current lat-lon projections
+#' @param iter.max Iterations for kmeans clustering to determine knot configuration
+#' @param randomseed Set seed for consistent random number generation
+#' @param nstart Number of starts for kmeans clustering algorithm
+#' @param DirPath Directory path to save results for \code{FishStatsUtils::Calc_Kmeans}
+#' @param Save_Results TRUE or FALSE to save results \code{FishStatsUtils::Calc_Kmeans}
+#' @param Lon_intensity The longitude of points to define the spatial mesh
+#' @param Lat_intensity The latitude of points to define the spatial mesh
 #' @param ... additional arguments passed to \code{INLA::inla.mesh.create}
 #' @importFrom RANN nn2
 #' @importFrom INLA inla.spde.make.A
+#' @importFrom FishStatsUtils Calc_Kmeans
+#' @importFrom FishStatsUtils Calc_Anisotropic_Mesh
+#' @importFrom FishStatsUtils Calc_Polygon_Areas_and_Polygons_Fn
 
 #' @return Tagged list containing objects for running a VAST model
 #' \describe{
@@ -29,7 +39,7 @@
 #'   \item{GridList}{A tagged list with inputs related to the 2D AR1 grid}
 #'   \item{a_xl}{A data frame with areas for each knot and each strattum}
 #'   \item{loc_UTM}{A data frame with the converted UTM coordinates for each sample}
-#'   \item{Kmeans}{Output from \code{Calc_Kmeans} with knots for a triangulated mesh}
+#'   \item{Kmeans}{Output from \code{FishStatsUtils::Calc_Kmeans} with knots for a triangulated mesh}
 #'   \item{knot_i}{The knot associated with each sample}
 #'   \item{Method}{The Method input (for archival purposes)}
 #'   \item{loc_x}{The UTM location for each knot}
@@ -72,7 +82,7 @@ make_spatial_info.ndd = function( n_x, Lon_i, Lat_i, Extrapolation_List, knot_me
     Grid_bounds = (grid_size_km/110) * apply(loc_e/(grid_size_km/110), MARGIN=2, FUN=function(vec){trunc(range(vec))+c(0,1)})
 
     # Calculate k-means centroids
-    Kmeans = Calc_Kmeans(n_x=n_x, loc_orig=loc_i[,c("Lon", "Lat")], randomseed=randomseed, ... )
+    Kmeans = FishStatsUtils::Calc_Kmeans(n_x=n_x, loc_orig=loc_i[,c("Lon", "Lat")], randomseed=randomseed, ... )
 
     # Calculate grid for 2D AR1 process
     loc_grid = expand.grid( 'Lon'=seq(Grid_bounds[1,1],Grid_bounds[2,1],by=grid_size_LL), 'Lat'=seq(Grid_bounds[1,2],Grid_bounds[2,2],by=grid_size_LL) )
@@ -94,7 +104,7 @@ make_spatial_info.ndd = function( n_x, Lon_i, Lat_i, Extrapolation_List, knot_me
     Grid_bounds = grid_size_km * apply(Extrapolation_List$Data_Extrap[,c('E_km','N_km')]/grid_size_km, MARGIN=2, FUN=function(vec){trunc(range(vec))+c(0,1)})
 
     # Calculate k-means centroids
-    Kmeans = Calc_Kmeans(n_x=n_x, loc_orig=loc_intensity[,c("E_km", "N_km")], randomseed=randomseed, nstart=nstart, DirPath=DirPath, Save_Results=Save_Results )
+    Kmeans = FishStatsUtils::Calc_Kmeans(n_x=n_x, loc_orig=loc_intensity[,c("E_km", "N_km")], randomseed=randomseed, nstart=nstart, DirPath=DirPath, Save_Results=Save_Results )
     NN_i = RANN::nn2( data=Kmeans[["centers"]], query=loc_i, k=1)$nn.idx[,1]
 
     # Calculate grid for 2D AR1 process
@@ -136,7 +146,7 @@ make_spatial_info.ndd = function( n_x, Lon_i, Lat_i, Extrapolation_List, knot_me
   latlon_i = cbind( 'Lat'=Lat_i, 'Lon'=Lon_i )
 
   # Make mesh and info for anisotropy  SpatialDeltaGLMM::
-  MeshList = Calc_Anisotropic_Mesh( Method=Method, loc_x=Kmeans$centers, loc_g=loc_g, loc_i=loc_i, Extrapolation_List=Extrapolation_List, fine_scale=fine_scale, ... )
+  MeshList = FishStatsUtils::Calc_Anisotropic_Mesh( Method=Method, loc_x=Kmeans$centers, loc_g=loc_g, loc_i=loc_i, Extrapolation_List=Extrapolation_List, fine_scale=fine_scale, ... )
   n_s = switch( tolower(Method), "mesh"=MeshList$anisotropic_spde$n.spde, "grid"=nrow(loc_x), "spherical_mesh"=MeshList$isotropic_spde$n.spde, "stream_network"=nrow(loc_x) )
 
   # Make matrices for 2D AR1 process
@@ -170,7 +180,7 @@ make_spatial_info.ndd = function( n_x, Lon_i, Lat_i, Extrapolation_List, knot_me
 
   # Calculate areas
   if( Method != "Stream_network" ){
-    PolygonList = Calc_Polygon_Areas_and_Polygons_Fn( loc_x=loc_x, Data_Extrap=Extrapolation_List[["Data_Extrap"]], a_el=Extrapolation_List[["a_el"]])
+    PolygonList = FishStatsUtils::Calc_Polygon_Areas_and_Polygons_Fn( loc_x=loc_x, Data_Extrap=Extrapolation_List[["Data_Extrap"]], a_el=Extrapolation_List[["a_el"]])
     if( fine_scale==FALSE ){
       a_gl = PolygonList[["a_xl"]]
     }
