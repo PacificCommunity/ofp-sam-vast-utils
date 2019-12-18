@@ -1,6 +1,6 @@
 test_that("fine scale, strata, and enviro is working",
 	{
-		# skip_on_travis()
+		skip_on_travis()
   		# Bring in test data
   			data(Data_Geostat)
   			data(enviro)
