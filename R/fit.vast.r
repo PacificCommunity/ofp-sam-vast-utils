@@ -6,7 +6,6 @@
 #' @param Data_Geostat A data-frame of i rows containing the following columns: Response_variable, Year, Lon, Lat, Spp, AreaSwept_km2, Vessel
 #' @param RunDir Path to the directory where the .cpp VAST source code is stored or compiled
 #' @param SaveDir Path to the directory where the outputs will be saved
-#' @param SourceDir Possibly obsolete: Path to ndd.vast.utils script that stores necessary helper functions 
 #' @param Q_ik Matrix or i rows and k covariates impacting catchability. Can be created using \code{stats::model.matrix}
 #' @param vf.re TRUE or FALSE switch indicating if vessel random effects are to be estimated. If so then the Vessel column in Data_Geostat is used
 #' @param FieldConfig Controls the number of factors estimated with the spatial and spatiotemporal random fields. default setting = c(Omega1 = 1, Epsilon1 = 1, Omega2 = 1, Epsilon2 = 1)
@@ -81,7 +80,7 @@
 # strata.sp = skj.alt2019.shp
 # enviro=enviro.a
 
-fit.vast = function(Data_Geostat,RunDir,SaveDir,SourceDir,Q_ik = NULL,vf.re = FALSE,FieldConfig=c(Omega1 = 1, Epsilon1 = 1, Omega2 = 1, Epsilon2 = 1),RhoConfig=c(Beta1 = 0, Beta2 = 0, Epsilon1 = 0, Epsilon2 = 0),ObsModel_ez = c(1,3),fine_scale=TRUE,input.grid.res=1,knot_method = "grid",n_x=100,Version="VAST_v8_3_0",Method="Mesh",strata.sp,enviro)
+fit.vast = function(Data_Geostat,RunDir,SaveDir,Q_ik = NULL,vf.re = FALSE,FieldConfig=c(Omega1 = 1, Epsilon1 = 1, Omega2 = 1, Epsilon2 = 1),RhoConfig=c(Beta1 = 0, Beta2 = 0, Epsilon1 = 0, Epsilon2 = 0),ObsModel_ez = c(1,3),fine_scale=TRUE,input.grid.res=1,knot_method = "grid",n_x=100,Version="VAST_v8_3_0",Method="Mesh",strata.sp,enviro)
 {
 	A = proc.time()
 
@@ -134,7 +133,7 @@ fit.vast = function(Data_Geostat,RunDir,SaveDir,SourceDir,Q_ik = NULL,vf.re = FA
 
 		# find overlap with land
 		# load land shape file
-			load(paste0(SourceDir,"pacific.coast.RData"))
+			data("pacific.coast")
 			pacific.coast = sp::spTransform(pacific.coast,crs.en)
 			over.index.land = which(is.na(sp::over(extrap.df,pacific.coast)))
 		# find overlap with data hull

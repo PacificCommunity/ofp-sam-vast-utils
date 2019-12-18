@@ -9,7 +9,7 @@ Authors@R:
 Description: Modifications of James-Thorson-NOAA/VAST and James-Thorson-NOAA/FishStatsUtils functions so that VAST works for the data and applications that I work with.
 License: GPL-3 + file LICENSE
 Encoding: UTF-8
-LazyData: true
+LazyData: false
 RoxygenNote: 7.0.2
 Depends:
 	R (>= 3.6.1) 
