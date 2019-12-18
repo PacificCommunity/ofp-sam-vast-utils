@@ -11,7 +11,7 @@ install:
   - R -e 'devtools::install_deps(dep = T)'
 
 script:
-  - R -e 'devtools::check(cran=FALSE)'
+  - R -e 'devtools::check(cran=FALSE,error_on="error")'
 
 r_github_packages:
   - James-Thorson-NOAA/VAST
