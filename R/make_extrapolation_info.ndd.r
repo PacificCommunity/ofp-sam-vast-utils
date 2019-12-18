@@ -17,6 +17,9 @@
 #'   \item{flip_around_dateline}{}
 #' }
 #' @importFrom rgeos gUnion
+#' @importFrom sp coordinates
+#' @importFrom sp proj4string
+#' @importFrom sp over
 #' @export
 
 make_extrapolation_info.ndd = function(Region,strata.limits,input.grid,crs.en,crs.ll,strata.sp)
@@ -63,12 +66,12 @@ make_extrapolation_info.ndd = function(Region,strata.limits,input.grid,crs.en,cr
 				colnames(a_el) = c("all_areas",names(strata.sp))
 
 				extrap.points = as.data.frame(Data_Extrap)
-				coordinates(extrap.points) = c("Lon", "Lat")
-	  			proj4string(extrap.points) = proj4string(strata.sp)
+				sp::coordinates(extrap.points) = c("Lon", "Lat")
+	  			sp::proj4string(extrap.points) = sp::proj4string(strata.sp)
 				a_el[,1] = Area_km2_x
 				for(i in 1:length(strata.sp))
 				{
-					a_el[,i+1] = Area_km2_x * ifelse(is.na(over(extrap.points,strata.sp[i])),0,1)
+					a_el[,i+1] = Area_km2_x * ifelse(is.na(sp::over(extrap.points,strata.sp[i])),0,1)
 				}
   		}
 
