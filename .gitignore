@@ -1,6 +1,7 @@
 *.o
 *.dll
 *.so
+*.cpp
 packageDescription.txt
 settings.txt
 testthatvast_output.RData
