@@ -6,6 +6,7 @@
 #' @param Data_Geostat A data-frame of i rows containing the following columns: Response_variable, Year, Lon, Lat, Spp, AreaSwept_km2, Vessel
 #' @param RunDir Path to the directory where the .cpp VAST source code is stored or compiled
 #' @param SaveDir Path to the directory where the outputs will be saved
+#' @param save.output TRUE or FALSE
 #' @param Q_ik Matrix or i rows and k covariates impacting catchability. Can be created using \code{stats::model.matrix}
 #' @param vf.re TRUE or FALSE switch indicating if vessel random effects are to be estimated. If so then the Vessel column in Data_Geostat is used
 #' @param FieldConfig Controls the number of factors estimated with the spatial and spatiotemporal random fields. default setting = c(Omega1 = 1, Epsilon1 = 1, Omega2 = 1, Epsilon2 = 1)
@@ -80,14 +81,17 @@
 # strata.sp = skj.alt2019.shp
 # enviro=enviro.a
 
-fit.vast = function(Data_Geostat,RunDir,SaveDir,Q_ik = NULL,vf.re = FALSE,FieldConfig=c(Omega1 = 1, Epsilon1 = 1, Omega2 = 1, Epsilon2 = 1),RhoConfig=c(Beta1 = 0, Beta2 = 0, Epsilon1 = 0, Epsilon2 = 0),ObsModel_ez = c(1,3),fine_scale=TRUE,input.grid.res=1,knot_method = "grid",n_x=100,Version="VAST_v8_3_0",Method="Mesh",strata.sp,enviro)
+fit.vast = function(Data_Geostat,RunDir,SaveDir,save.output=FALSE,Q_ik = NULL,vf.re = FALSE,FieldConfig=c(Omega1 = 1, Epsilon1 = 1, Omega2 = 1, Epsilon2 = 1),RhoConfig=c(Beta1 = 0, Beta2 = 0, Epsilon1 = 0, Epsilon2 = 0),ObsModel_ez = c(1,3),fine_scale=TRUE,input.grid.res=1,knot_method = "grid",n_x=100,Version="VAST_v8_3_0",Method="Mesh",strata.sp,enviro)
 {
 	A = proc.time()
 
 	if(!dir.exists(RunDir)){dir.create(RunDir, recursive = TRUE)}
 		origwd = getwd()
 		setwd(RunDir)
-	if(!dir.exists(SaveDir)){dir.create(SaveDir, recursive = TRUE)}
+	if(save.output)
+	{
+		if(!dir.exists(SaveDir)){dir.create(SaveDir, recursive = TRUE)}
+	}
 
 
 	# Decide which post-hoc calculations to include in VAST output
@@ -152,7 +156,7 @@ fit.vast = function(Data_Geostat,RunDir,SaveDir,Q_ik = NULL,vf.re = FALSE,FieldC
 			# ll_to_EN = Convert_LL_to_EastNorth_Fn.ndd( Lon=Data_Geostat[,'Lon'], Lat=Data_Geostat[,'Lat'],crs.en = crs.en,crs.ll = crs.ll)
 			Spatial_List = make_spatial_info.ndd(n_x=n_x, Lon_i=Data_Geostat[,'Lon'], Lat_i=Data_Geostat[,'Lat'], Extrapolation_List = Extrapolation_List, knot_method="grid", Method="Mesh",
 												  grid_size_km=grid_size_km, grid_size_LL=input.grid.res, fine_scale=fine_scale, Network_sz_LL=NULL,
-												  iter.max=1000, randomseed=seed, nstart=100, DirPath=SaveDir, Save_Results=FALSE,crs.en = crs.en,crs.ll = crs.ll)
+												  iter.max=1000, randomseed=seed, nstart=100, DirPath=SaveDir, Save_Results=save.output,crs.en = crs.en,crs.ll = crs.ll)
 
 			Data_Geostat = cbind(Data_Geostat, knot_i = Spatial_List$knot_i)
 
@@ -194,7 +198,7 @@ fit.vast = function(Data_Geostat,RunDir,SaveDir,Q_ik = NULL,vf.re = FALSE,FieldC
 			fit.time = (B-A)[3]
 
 			vast_output = list( "Opt"=Opt, "Report"=Report, "TmbData"=TmbData, "Extrapolation_List"=Extrapolation_List, "fit.time"=fit.time,"MapDetails_List"=MapDetails_List )
-			if(!missing(SaveDir))
+			if(save.output)
 			{
 				save(vast_output,file=paste0(SaveDir,"vast_output.RData"))
 			}
