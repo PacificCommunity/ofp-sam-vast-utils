@@ -1,0 +1,87 @@
+Package: VAST
+Type: Package
+Title: Vector-autoregressive spatio-temporal (VAST) model
+Version: 3.2.2
+Date: 2019-11-09
+Authors@R: person("James","Thorson", email="James.Thorson@noaa.gov",
+        role=c("aut","cre"))
+Maintainer: James Thorson <James.Thorson@noaa.gov>
+Description: VAST is an R package for conducting spatio-temporal
+        analysis of data from multiple categories (species, sizes,
+        etc.), and includes both spatial and spatio-temporal variation
+        in density for each category, with either factor-analysis or
+        autoregressive correlations among categories, with derived
+        calculation of abundance indices, center-of-gravity, and
+        area-occupied.
+Imports: graphics, utils, deldir, stats, colorspace, devtools, abind,
+        MatrixModels, ThorsonUtilities, TMBhelper
+Depends: R (>= 3.5.0), TMB
+Suggests: testthat, knitr, rmarkdown, FishStatsUtils, R.rsp
+Remotes: james-thorson/FishStatsUtils, james-thorson/utilities,
+        kaskr/TMB_contrib_R/TMBhelper
+License: GPL-3
+LazyData: yes
+BuildVignettes: yes
+RoxygenNote: 6.1.1
+URL: http://github.com/James-Thorson/VAST
+BugReports: http://github.com/James-Thorson/VAST/issues
+VignetteBuilder: R.rsp
+RemoteType: github
+RemoteHost: api.github.com
+RemoteRepo: VAST
+RemoteUsername: james-thorson
+RemoteRef: master
+RemoteSha: 20b52822d011a3d7604c747b572920fd4e3fa727
+GithubRepo: VAST
+GithubUsername: james-thorson
+GithubRef: master
+GithubSHA1: 20b52822d011a3d7604c747b572920fd4e3fa727
+NeedsCompilation: no
+Packaged: 2019-12-09 21:52:24 UTC; nicholasd
+Author: James Thorson [aut, cre]
+Built: R 3.6.1; ; 2019-12-09 21:52:27 UTC; windows
+
+-- File: C:/Users/nicholasd/HOME/R/win-library/3.6/VAST/Meta/package.rds 
+Package: FishStatsUtils
+Type: Package
+Title: Utilities (shared code and data) for FishStats spatio-temporal
+        modeling toolbox
+Version: 2.3.4
+Date: 2019-10-10
+Authors@R: person("James","Thorson", email="James.Thorson@noaa.gov",
+        role=c("aut","cre"))
+Maintainer: James Thorson <James.Thorson@noaa.gov>
+Description: FishStatsUtils contains utilities (shared code and data)
+        used by multiple packages (VAST, SpatialDeltaGLMM, MIST,
+        Spatial_FA, SpatialDFA, surplus_production, EOFR) that are
+        designed for spatio-temporal analysis of ecological data.
+Imports: graphics, utils, mapproj, maptools, deldir, PBSmapping, RANN,
+        stats, colorspace, RandomFields, RandomFieldsUtils, shape,
+        devtools, mixtools, sp, plotKML, plotrix, TMB, MatrixModels,
+        rgdal, ThorsonUtilities, abind, corpcor, pander, rnaturalearth,
+        formatR
+Depends: R (>= 3.1.0)
+Suggests: testthat
+Remotes: james-thorson/utilities
+License: GPL-3
+LazyData: yes
+BuildVignettes: yes
+RoxygenNote: 6.1.1
+URL: http://github.com/james-thorson/FishStatsUtils
+BugReports: http://github.com/james-thorson/FishStatsUtils/issues
+RemoteType: github
+RemoteHost: api.github.com
+RemoteRepo: FishStatsUtils
+RemoteUsername: james-thorson
+RemoteRef: 2.3.4
+RemoteSha: 6baedadbcd3fc76e916fbb68c17363a8f318a7f4
+GithubRepo: FishStatsUtils
+GithubUsername: james-thorson
+GithubRef: 2.3.4
+GithubSHA1: 6baedadbcd3fc76e916fbb68c17363a8f318a7f4
+NeedsCompilation: no
+Packaged: 2019-12-09 21:56:18 UTC; nicholasd
+Author: James Thorson [aut, cre]
+Built: R 3.6.1; ; 2019-12-09 21:56:27 UTC; windows
+
+-- File: C:/Users/nicholasd/HOME/R/win-library/3.6/FishStatsUtils/Meta/package.rds 
