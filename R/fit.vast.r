@@ -194,7 +194,10 @@ fit.vast = function(Data_Geostat,RunDir,SaveDir,Q_ik = NULL,vf.re = FALSE,FieldC
 			fit.time = (B-A)[3]
 
 			vast_output = list( "Opt"=Opt, "Report"=Report, "TmbData"=TmbData, "Extrapolation_List"=Extrapolation_List, "fit.time"=fit.time,"MapDetails_List"=MapDetails_List )
-			save(vast_output,file=paste0(SaveDir,"vast_output.RData"))
+			if(!missing(SaveDir))
+			{
+				save(vast_output,file=paste0(SaveDir,"vast_output.RData"))
+			}
 			setwd(origwd)
 
 		return(vast_output)
