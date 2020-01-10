@@ -34,7 +34,8 @@
 #'   \item{ObsModel_ez[e,2]=4}{Poisson-link delta-model, but fixing encounter probability=1 for any year where all samples encounter the species and encounter probability=0 for any year where no samples encounter the species}
 #' }
 #' @param fine_scale TRUE or FALSE. Better maps and slightly better index fit when TRUE but is slower.
-#' @param input.grid.res Resolution of extrapolation grid in kilometers. d
+#' @param input.grid.res Resolution of extrapolation grid in kilometers.
+#' @param crop.extrap.by.data TRUE or FALSE: If TRUE then the extrapolation grid is cropped by the smooth hull surrounding the data
 #' @param knot_method knot_method whether to determine location of GMRF vertices based on the location of samples \code{knot_method=`samples`} or extrapolation-grid cells within the specified strata \code{knot_method='grid'}
 #' @param n_x Number of knots
 #' @param Version Version of VAST to use. Compatible with version "VAST_v8_3_0"
@@ -81,7 +82,7 @@
 # strata.sp = skj.alt2019.shp
 # enviro=enviro.a
 
-fit.vast = function(Data_Geostat,RunDir,SaveDir,save.output=FALSE,Q_ik = NULL,vf.re = FALSE,FieldConfig=c(Omega1 = 1, Epsilon1 = 1, Omega2 = 1, Epsilon2 = 1),RhoConfig=c(Beta1 = 0, Beta2 = 0, Epsilon1 = 0, Epsilon2 = 0),ObsModel_ez = c(1,3),fine_scale=TRUE,input.grid.res=1,knot_method = "grid",n_x=100,Version="VAST_v8_3_0",Method="Mesh",strata.sp,enviro)
+fit.vast = function(Data_Geostat,RunDir,SaveDir,save.output=FALSE,Q_ik = NULL,vf.re = FALSE,FieldConfig=c(Omega1 = 1, Epsilon1 = 1, Omega2 = 1, Epsilon2 = 1),RhoConfig=c(Beta1 = 0, Beta2 = 0, Epsilon1 = 0, Epsilon2 = 0),ObsModel_ez = c(1,3),fine_scale=TRUE,input.grid.res=1,crop.extrap.by.data=TRUE,knot_method = "grid",n_x=100,Version="VAST_v8_3_0",Method="Mesh",strata.sp,enviro)
 {
 	A = proc.time()
 
@@ -129,23 +130,28 @@ fit.vast = function(Data_Geostat,RunDir,SaveDir,save.output=FALSE,Q_ik = NULL,vf
 			}		 
 
 		# punch-out all extrapolation grid cells that are on land and outside of "data region"
-			smooth.hull = smooth.hull.sp(Data_Geostat[,c("Lon","Lat")],crs.ll=crs.ll,buffer.ll=2.5,d.scalar = 0.15)
 			extrap.df = as.data.frame(Extrapolation_List$Data_Extrap)
 			sp::coordinates(extrap.df) = ~E_km + N_km
 			sp::proj4string(extrap.df) = crs.en
-			# plot(smooth.hull)
 
 		# find overlap with land
 		# load land shape file
 			data("pacific.coast")
 			pacific.coast = sp::spTransform(pacific.coast,crs.en)
 			over.index.land = which(is.na(sp::over(extrap.df,pacific.coast)))
-		# find overlap with data hull
+		if(crop.extrap.by.data)
+		{
+			# find overlap with data hull
+			smooth.hull = smooth.hull.sp(Data_Geostat[,c("Lon","Lat")],crs.ll=crs.ll,buffer.ll=2.5,d.scalar = 0.15)
+			# plot(smooth.hull)
 			smooth.hull.trans = sp::spTransform(smooth.hull,crs.en)
-		# identify number of extrapolation cells (within data hull and not on land) corresponding to each knot
-			over.index.region = which(!is.na(sp::over(extrap.df,smooth.hull.trans)))
-			over.index = intersect(over.index.land,over.index.region)
-
+			# identify number of extrapolation cells (within data hull and not on land) corresponding to each knot
+				over.index.region = which(!is.na(sp::over(extrap.df,smooth.hull.trans)))
+				over.index = intersect(over.index.land,over.index.region)
+		} else {
+			over.index = over.index.land
+		}
+		
 		# modify Extrapolation_List
 			Extrapolation_List$a_el = data.frame(All_areas = Extrapolation_List$a_el[over.index,])
 			Extrapolation_List$Data_Extrap = Extrapolation_List$Data_Extrap[over.index,]

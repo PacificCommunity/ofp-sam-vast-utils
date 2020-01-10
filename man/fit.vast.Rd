@@ -17,6 +17,7 @@ fit.vast(
   ObsModel_ez = c(1, 3),
   fine_scale = TRUE,
   input.grid.res = 1,
+  crop.extrap.by.data = TRUE,
   knot_method = "grid",
   n_x = 100,
   Version = "VAST_v8_3_0",
@@ -67,7 +68,9 @@ fit.vast(
 
 \item{fine_scale}{TRUE or FALSE. Better maps and slightly better index fit when TRUE but is slower.}
 
-\item{input.grid.res}{Resolution of extrapolation grid in kilometers. d}
+\item{input.grid.res}{Resolution of extrapolation grid in kilometers.}
+
+\item{crop.extrap.by.data}{TRUE or FALSE: If TRUE then the extrapolation grid is cropped by the smooth hull surrounding the data}
 
 \item{knot_method}{knot_method whether to determine location of GMRF vertices based on the location of samples \code{knot_method=`samples`} or extrapolation-grid cells within the specified strata \code{knot_method='grid'}}
 
