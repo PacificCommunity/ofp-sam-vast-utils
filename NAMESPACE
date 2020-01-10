@@ -2,6 +2,8 @@
 
 export(Convert_EN_to_LL_Fn.ndd)
 export(Convert_LL_to_EastNorth_Fn.ndd)
+export(calc.clockwise.angle)
+export(chaikin.open)
 export(fit.vast)
 export(make_covariates.ndd)
 export(make_extrapolation_info.ndd)

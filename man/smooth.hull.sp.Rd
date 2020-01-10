@@ -2,9 +2,16 @@
 % Please edit documentation in R/smooth.hull.sp.r
 \name{smooth.hull.sp}
 \alias{smooth.hull.sp}
-\title{Calculate a smooth hull around a set of points}
+\title{Calculate a smooth hull around a set of points
+Calculate a smooth polygon around a set of points using Bezier curves, with the smooth polygon passing through the vertices of the convex hull containing the set of points
+once bezier control points are added the polygon is smoothed using chaikin's corner cutting algorithm
+add buffer if desired
+inspired by the following answers from stackexchange
+Dan H's answer: https://gis.stackexchange.com/questions/24827/smoothing-polygons-in-contour-map/24929#24929
+John Hughes's answer: https://math.stackexchange.com/questions/656500/given-a-point-slope-and-a-distance-along-that-slope-easily-find-a-second-p
+https://stackoverflow.com/questions/42630703/create-buffer-around-spatial-data-in-r/42641283}
 \usage{
-smooth.hull.sp(pts, crs.ll, buffer.ll, vertices = 100, k = 3)
+smooth.hull.sp(pts, crs.ll, buffer.ll, d = 0.15)
 }
 \arguments{
 \item{pts}{List/Data Frame with two entries: one for x and one for y}
@@ -13,13 +20,18 @@ smooth.hull.sp(pts, crs.ll, buffer.ll, vertices = 100, k = 3)
 
 \item{buffer.ll}{Size of buffer in degrees of lat/lon}
 
-\item{vertices}{Number of vertices in buffer}
-
-\item{k}{Degree of smoothness of buffer, bigger number more smooth (?)}
+\item{d}{ratio bounded by (0,0.5) and controls the tightness of smooth to the original chull points}
 }
 \value{
 A spatial polygon object
 }
 \description{
 Calculate a smooth hull around a set of points
+Calculate a smooth polygon around a set of points using Bezier curves, with the smooth polygon passing through the vertices of the convex hull containing the set of points
+once bezier control points are added the polygon is smoothed using chaikin's corner cutting algorithm
+add buffer if desired
+inspired by the following answers from stackexchange
+Dan H's answer: https://gis.stackexchange.com/questions/24827/smoothing-polygons-in-contour-map/24929#24929
+John Hughes's answer: https://math.stackexchange.com/questions/656500/given-a-point-slope-and-a-distance-along-that-slope-easily-find-a-second-p
+https://stackoverflow.com/questions/42630703/create-buffer-around-spatial-data-in-r/42641283
 }
