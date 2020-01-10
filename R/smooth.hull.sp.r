@@ -11,7 +11,7 @@
 #' @param pts List/Data Frame with two entries: one for x and one for y
 #' @param crs.ll Character string of the crs for the current lat-lon projections
 #' @param buffer.ll Size of buffer in degrees of lat/lon
-#' @param d ratio bounded by (0,0.5) and controls the tightness of smooth to the original chull points
+#' @param d.scalar ratio bounded by (0,0.5) and controls the tightness of smooth to the original chull points
 #' @return A spatial polygon object
 #' @importFrom sp Polygon
 #' @importFrom sp Polygons
@@ -20,7 +20,7 @@
 #' @importFrom rgeos gBuffer
 #' @export
 
-smooth.hull.sp = function(pts,crs.ll,buffer.ll,d=0.15)
+smooth.hull.sp = function(pts,crs.ll,buffer.ll,d.scalar=0.15)
 # pts is a list
 {
     # calculate chull

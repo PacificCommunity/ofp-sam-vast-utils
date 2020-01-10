@@ -11,7 +11,7 @@ Dan H's answer: https://gis.stackexchange.com/questions/24827/smoothing-polygons
 John Hughes's answer: https://math.stackexchange.com/questions/656500/given-a-point-slope-and-a-distance-along-that-slope-easily-find-a-second-p
 https://stackoverflow.com/questions/42630703/create-buffer-around-spatial-data-in-r/42641283}
 \usage{
-smooth.hull.sp(pts, crs.ll, buffer.ll, d = 0.15)
+smooth.hull.sp(pts, crs.ll, buffer.ll, d.scalar = 0.15)
 }
 \arguments{
 \item{pts}{List/Data Frame with two entries: one for x and one for y}
@@ -20,7 +20,7 @@ smooth.hull.sp(pts, crs.ll, buffer.ll, d = 0.15)
 
 \item{buffer.ll}{Size of buffer in degrees of lat/lon}
 
-\item{d}{ratio bounded by (0,0.5) and controls the tightness of smooth to the original chull points}
+\item{d.scalar}{ratio bounded by (0,0.5) and controls the tightness of smooth to the original chull points}
 }
 \value{
 A spatial polygon object

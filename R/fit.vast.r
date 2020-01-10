@@ -129,7 +129,7 @@ fit.vast = function(Data_Geostat,RunDir,SaveDir,save.output=FALSE,Q_ik = NULL,vf
 			}		 
 
 		# punch-out all extrapolation grid cells that are on land and outside of "data region"
-			smooth.hull = smooth.hull.sp(Data_Geostat[,c("Lon","Lat")],crs.ll=crs.ll,buffer.ll=2.5,vertices = 45, k=5)
+			smooth.hull = smooth.hull.sp(Data_Geostat[,c("Lon","Lat")],crs.ll=crs.ll,buffer.ll=2.5,d.scalar = 0.15)
 			extrap.df = as.data.frame(Extrapolation_List$Data_Extrap)
 			sp::coordinates(extrap.df) = ~E_km + N_km
 			sp::proj4string(extrap.df) = crs.en
