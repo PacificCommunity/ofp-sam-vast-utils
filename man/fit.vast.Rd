@@ -22,6 +22,8 @@ fit.vast(
   n_x = 100,
   Version = "VAST_v8_3_0",
   Method = "Mesh",
+  ADREPORT = TRUE,
+  normalize_idx = TRUE,
   strata.sp,
   enviro
 )
@@ -79,6 +81,10 @@ fit.vast(
 \item{Version}{Version of VAST to use. Compatible with version "VAST_v8_3_0"}
 
 \item{Method}{Method to use for defining spatial field. default setting = "Mesh"}
+
+\item{ADREPORT}{Calculate the SD for the params and index?}
+
+\item{normalize_idx}{Normalize the index (and the SD) by dividing by the mean of the index}
 
 \item{strata.sp}{[Optional] If present, a shapefile containing the strata boundaries to calculate the indicies for}
 

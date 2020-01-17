@@ -40,6 +40,8 @@
 #' @param n_x Number of knots
 #' @param Version Version of VAST to use. Compatible with version "VAST_v8_3_0"
 #' @param Method Method to use for defining spatial field. default setting = "Mesh"
+#' @param ADREPORT Calculate the SD for the params and index?
+#' @param normalize_idx Normalize the index (and the SD) by dividing by the mean of the index
 #' @param strata.sp [Optional] If present, a shapefile containing the strata boundaries to calculate the indicies for
 #' @param enviro [Optional] If present, a named-list of length two is required: "formula" is a character string that can be coerced to a formula using \code{stats::as.formula}, and "covariate_data" is a data frame with the following columns - Year, Lon, Lat, covariates...
 #' @return Named list "vast_output"
@@ -62,6 +64,8 @@
 #' @importFrom VAST make_data
 #' @importFrom VAST make_model
 #' @importFrom TMBhelper fit_tmb
+#' @importFrom TMB sdreport
+#' @importFrom TMB summary.sdreport
 
 
 ### Function defaults for testing 
@@ -82,7 +86,7 @@
 # strata.sp = skj.alt2019.shp
 # enviro=enviro.a
 
-fit.vast = function(Data_Geostat,RunDir,SaveDir,save.output=FALSE,Q_ik = NULL,vf.re = FALSE,FieldConfig=c(Omega1 = 1, Epsilon1 = 1, Omega2 = 1, Epsilon2 = 1),RhoConfig=c(Beta1 = 0, Beta2 = 0, Epsilon1 = 0, Epsilon2 = 0),ObsModel_ez = c(1,3),fine_scale=TRUE,input.grid.res=1,crop.extrap.by.data=TRUE,knot_method = "grid",n_x=100,Version="VAST_v8_3_0",Method="Mesh",strata.sp,enviro)
+fit.vast = function(Data_Geostat,RunDir,SaveDir,save.output=FALSE,Q_ik = NULL,vf.re = FALSE,FieldConfig=c(Omega1 = 1, Epsilon1 = 1, Omega2 = 1, Epsilon2 = 1),RhoConfig=c(Beta1 = 0, Beta2 = 0, Epsilon1 = 0, Epsilon2 = 0),ObsModel_ez = c(1,3),fine_scale=TRUE,input.grid.res=1,crop.extrap.by.data=TRUE,knot_method = "grid",n_x=100,Version="VAST_v8_3_0",Method="Mesh",ADREPORT=TRUE,normalize_idx=TRUE,strata.sp,enviro)
 {
 	A = proc.time()
 
@@ -197,13 +201,44 @@ fit.vast = function(Data_Geostat,RunDir,SaveDir,save.output=FALSE,Q_ik = NULL,vf
 			Obj$gr( Obj$par )
 
 		# Estimate fixed effects and predict random effects
-			Opt = TMBhelper::fit_tmb( obj = Obj, lower = TmbList[["Lower"]], upper = TmbList[["Upper"]],
-				getsd = FALSE, savedir = NULL, bias.correct = FALSE, newtonsteps = 3 )
-			B = proc.time()
-			Report = Obj$report()
-			fit.time = (B-A)[3]
+			if(ADREPORT)
+			{
+				Opt = TMBhelper::fit_tmb( obj = Obj, lower = TmbList[["Lower"]], upper = TmbList[["Upper"]],
+				getsd = TRUE, savedir = NULL, bias.correct = FALSE, newtonsteps = 3 )
+				B = proc.time()
+				Report = Obj$report()
+				Sdreport = TMB::sdreport(Obj)
 
-			vast_output = list( "Opt"=Opt, "Report"=Report, "TmbData"=TmbData, "Extrapolation_List"=Extrapolation_List, "fit.time"=fit.time,"MapDetails_List"=MapDetails_List )
+				fit.time = (B-A)[3]
+				idx = Report$Index_cyl[1,,]
+				idx.se = array( TMB::summary.sdreport(Sdreport)[which(rownames(TMB::summary.sdreport(Sdreport))=="Index_cyl"),2], dim=c(dim(Report$Index_cyl)), dimnames=list(NULL,NULL,NULL) )[1,,]
+
+				if(normalize_idx)
+				{
+					for(j in 1:ncol(idx))
+					{
+						j.mean = mean(idx[,j])
+						idx[,j] = idx[,j]/j.mean
+						idx.se[,j] = idx.se[,j]/j.mean
+					}
+				}
+				vast_output = list("idx"=idx,"idx.se"=idx.se, "Opt"=Opt, "Report"=Report, "TmbData"=TmbData, "Extrapolation_List"=Extrapolation_List, "fit.time"=fit.time,"MapDetails_List"=MapDetails_List )
+		
+			} else {
+				Opt = TMBhelper::fit_tmb( obj = Obj, lower = TmbList[["Lower"]], upper = TmbList[["Upper"]],
+				getsd = FALSE, savedir = NULL, bias.correct = FALSE, newtonsteps = 3 )
+				B = proc.time()
+				Report = Obj$report()
+				fit.time = (B-A)[3]
+				idx = Report$Index_cyl[1,,]
+				if(normalize_idx)
+				{
+					idx = apply(idx,2,function(x)x/mean(x))
+				}
+				vast_output = list("idx"=idx, "Opt"=Opt, "Report"=Report, "TmbData"=TmbData, "Extrapolation_List"=Extrapolation_List, "fit.time"=fit.time,"MapDetails_List"=MapDetails_List )
+		
+			}
+
 			if(save.output)
 			{
 				save(vast_output,file=paste0(SaveDir,"vast_output.RData"))
