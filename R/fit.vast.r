@@ -40,12 +40,14 @@
 #' @param n_x Number of knots
 #' @param Version Version of VAST to use. Compatible with version "VAST_v8_3_0"
 #' @param Method Method to use for defining spatial field. default setting = "Mesh"
-#' @param ADREPORT Calculate the SD for the params and index?
-#' @param normalize_idx Normalize the index (and the SD) by dividing by the mean of the index
+#' @param ADREPORT TRUE or FALSE. Calculate the SD for the params and index?
+#' @param normalize_idx TRUE or FALSE. Normalize the index (and the SE) by dividing by the mean of the index
 #' @param strata.sp [Optional] If present, a shapefile containing the strata boundaries to calculate the indicies for
 #' @param enviro [Optional] If present, a named-list of length two is required: "formula" is a character string that can be coerced to a formula using \code{stats::as.formula}, and "covariate_data" is a data frame with the following columns - Year, Lon, Lat, covariates...
 #' @return Named list "vast_output"
 #' \describe{
+#'  \item{idx}{the index within each strata if strata is provided}
+#'  \item{idx.se}{the associated se for the index}
 #'	\item{Opt}{the diagnostics from the model run}
 #'  \item{Report}{the objects estimated and calculated by VAST}
 #'  \item{TmbData}{the data passed to TMB and used to fit the model}

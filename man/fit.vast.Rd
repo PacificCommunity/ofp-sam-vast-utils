@@ -82,9 +82,9 @@ fit.vast(
 
 \item{Method}{Method to use for defining spatial field. default setting = "Mesh"}
 
-\item{ADREPORT}{Calculate the SD for the params and index?}
+\item{ADREPORT}{TRUE or FALSE. Calculate the SD for the params and index?}
 
-\item{normalize_idx}{Normalize the index (and the SD) by dividing by the mean of the index}
+\item{normalize_idx}{TRUE or FALSE. Normalize the index (and the SE) by dividing by the mean of the index}
 
 \item{strata.sp}{[Optional] If present, a shapefile containing the strata boundaries to calculate the indicies for}
 
@@ -93,6 +93,8 @@ fit.vast(
 \value{
 Named list "vast_output"
 \describe{
+ \item{idx}{the index within each strata if strata is provided}
+ \item{idx.se}{the associated se for the index}
 \item{Opt}{the diagnostics from the model run}
  \item{Report}{the objects estimated and calculated by VAST}
  \item{TmbData}{the data passed to TMB and used to fit the model}
