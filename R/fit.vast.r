@@ -42,6 +42,13 @@
 #' @param Method Method to use for defining spatial field. default setting = "Mesh"
 #' @param ADREPORT TRUE or FALSE. Calculate the SD for the params and index?
 #' @param normalize_idx TRUE or FALSE. Normalize the index (and the SE) by dividing by the mean of the index
+#' @param Xconfig_zcp OPTIONAL, 3D array of settings for each dynamic density covariate, where the first dimension corresponds to 1st or 2nd linear predictors, second dimension corresponds to model category, and third dimension corresponds to each density covariate
+#' \describe{
+#'   \item{Xconfig_zcp[z,c,p]=0}{\code{X_itp[,,p]} has no effect on linear predictor z for category c}
+#'   \item{Xconfig_zcp[z,c,p]=1}{\code{X_itp[,,p]} has a linear effect on linear predictor z for category c}
+#'   \item{Xconfig_zcp[z,c,p]=2}{\code{X_itp[,,p]} has a spatially varying, zero-centered linear effect on linear predictor z for category c}
+#'   \item{Xconfig_zcp[z,c,p]=3}{\code{X_itp[,,p]} has a spatially varying linear effect on linear predictor z for category c}
+#' }
 #' @param strata.sp [Optional] If present, a shapefile containing the strata boundaries to calculate the indicies for
 #' @param enviro [Optional] If present, a named-list of length two is required: "formula" is a character string that can be coerced to a formula using \code{stats::as.formula}, and "covariate_data" is a data frame with the following columns - Year, Lon, Lat, covariates...
 #' @return Named list "vast_output"
@@ -88,7 +95,7 @@
 # strata.sp = skj.alt2019.shp
 # enviro=enviro.a
 
-fit.vast = function(Data_Geostat,RunDir,SaveDir,save.output=FALSE,Q_ik = NULL,vf.re = FALSE,FieldConfig=c(Omega1 = 1, Epsilon1 = 1, Omega2 = 1, Epsilon2 = 1),RhoConfig=c(Beta1 = 0, Beta2 = 0, Epsilon1 = 0, Epsilon2 = 0),ObsModel_ez = c(1,3),fine_scale=TRUE,input.grid.res=1,crop.extrap.by.data=TRUE,knot_method = "grid",n_x=100,Version="VAST_v8_3_0",Method="Mesh",ADREPORT=TRUE,normalize_idx=TRUE,strata.sp,enviro)
+fit.vast = function(Data_Geostat,RunDir,SaveDir,save.output=FALSE,Q_ik = NULL,vf.re = FALSE,FieldConfig=c(Omega1 = 1, Epsilon1 = 1, Omega2 = 1, Epsilon2 = 1),RhoConfig=c(Beta1 = 0, Beta2 = 0, Epsilon1 = 0, Epsilon2 = 0),ObsModel_ez = c(1,3),fine_scale=TRUE,input.grid.res=1,crop.extrap.by.data=TRUE,knot_method = "grid",n_x=100,Version="VAST_v8_3_0",Method="Mesh",ADREPORT=TRUE,normalize_idx=TRUE,Xconfig_zcp=NULL,strata.sp,enviro)
 {
 	A = proc.time()
 
@@ -181,6 +188,7 @@ fit.vast = function(Data_Geostat,RunDir,SaveDir,save.output=FALSE,Q_ik = NULL,vf
 	  		{
 	  			X_gtp = NULL
 	  			X_itp = NULL
+	  			Xconfig_zcp = NULL
 	  		} else {
 	  			enviro.format = make_covariates.ndd(formula = as.formula(enviro[["formula"]]),covariate_data=enviro[["covariate_data"]], Year_i=Data_Geostat[,'Year'], spatial_list=Spatial_List, extrapolation_list=Extrapolation_List)
 	  			X_gtp = enviro.format$X_gtp
@@ -191,7 +199,7 @@ fit.vast = function(Data_Geostat,RunDir,SaveDir,save.output=FALSE,Q_ik = NULL,vf
 			TmbData = VAST::make_data("Version"=Version, "FieldConfig"=FieldConfig, "OverdispersionConfig"=OverdispersionConfig, 
 							"RhoConfig"=RhoConfig, "ObsModel_ez"=ObsModel_ez, 
 							"c_iz"=as.numeric(Data_Geostat[,'Spp'])-1, "b_i"=Data_Geostat[,'Response_variable'], 
-							"a_i"=Data_Geostat[,'AreaSwept_km2'], "v_i"=v_i, "Q_ik" = Q_ik, "X_gtp" = X_gtp, "X_itp" = X_itp,
+							"a_i"=Data_Geostat[,'AreaSwept_km2'], "v_i"=v_i, "Q_ik" = Q_ik, "X_gtp" = X_gtp, "X_itp" = X_itp, "Xconfig_zcp"=Xconfig_zcp,
 							"t_iz"=Data_Geostat[,'Year'], 
 							"Options"=Options, "spatial_list" = Spatial_List )
 
@@ -224,7 +232,7 @@ fit.vast = function(Data_Geostat,RunDir,SaveDir,save.output=FALSE,Q_ik = NULL,vf
 						idx.se[,j] = idx.se[,j]/j.mean
 					}
 				}
-				vast_output = list("idx"=idx,"idx.se"=idx.se, "Opt"=Opt, "Report"=Report, "TmbData"=TmbData, "Extrapolation_List"=Extrapolation_List, "fit.time"=fit.time,"MapDetails_List"=MapDetails_List )
+				vast_output = list("idx"=idx,"idx.se"=idx.se, "Opt"=Opt, "Report"=Report,"Sdreport" = Sdreport, "TmbData"=TmbData, "Extrapolation_List"=Extrapolation_List, "fit.time"=fit.time,"MapDetails_List"=MapDetails_List )
 		
 			} else {
 				Opt = TMBhelper::fit_tmb( obj = Obj, lower = TmbList[["Lower"]], upper = TmbList[["Upper"]],
