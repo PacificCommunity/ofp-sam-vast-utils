@@ -72,6 +72,8 @@
 #' @importFrom sp spTransform
 #' @importFrom FishStatsUtils make_map_info
 #' @importFrom FishStatsUtils plot_data
+#' @importFrom FishStatsUtils make_extrapolation_info
+#' @importFrom FishStatsUtils make_spatial_info
 #' @importFrom VAST make_data
 #' @importFrom VAST make_model
 #' @importFrom TMBhelper fit_tmb
@@ -136,13 +138,38 @@ fit.vast = function(Data_Geostat,RunDir,SaveDir,save.output=FALSE,Q_ik = NULL,vf
 			input.grid = as.matrix(expand.grid(Lat = seq(from=grid_bounds[1],to=grid_bounds[2],by=input.grid.res),
 					Lon = seq(from=grid_bounds[3],to=grid_bounds[4],by=input.grid.res), Area_km2 = grid_size_km))
 			crs.en = paste0("+proj=tpeqd +lat_1=",mean(grid_bounds[1:2])," +lon_1=",round(grid_bounds[3] + (1/3)*abs(diff(grid_bounds[3:4])))," +lat_2=",mean(grid_bounds[1:2])," +lon_2=",round(grid_bounds[3] + (2/3)*abs(diff(grid_bounds[3:4])))," +datum=WGS84 +ellps=WGS84 +units=km +no_defs")
-			crs.ll = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0"
-			if(missing(strata.sp))
-			{
-				Extrapolation_List = make_extrapolation_info.ndd(Region = Region,strata.limits = strata.limits,input.grid = input.grid, crs.en = crs.en,crs.ll = crs.ll)
-			} else {
-				Extrapolation_List = make_extrapolation_info.ndd(Region = Region,strata.limits = strata.limits,input.grid = input.grid, crs.en = crs.en,crs.ll = crs.ll,strata.sp)
-			}		 
+
+			Extrapolation_List = FishStatsUtils::make_extrapolation_info( Region, projargs=crs.en, strata.limits=data.frame('STRATA'="All_areas"),
+  															create_strata_per_region=FALSE, input_grid=input.grid, observations_LL=Data_Geostat[,c("Lat","Lon")], 
+  															grid_dim_km=c(grid_size_km,grid_size_km),flip_around_dateline = TRUE)
+
+				# reformat Extrapolation_List$a_el
+					if(!missing(strata.sp))
+					{
+						# define union of model region
+						n.substrata = length(strata.sp)
+						full.reg = strata.sp[1]
+						for(i in 2:length(strata.sp)){full.reg = rgeos::gUnion(full.reg,strata.sp[i])}
+						strata.sp = rbind(full.reg,strata.sp)
+						new_IDs = c("all.strata",paste0("sub.strata.",1:n.substrata))
+						for (i in 1:length(slot(strata.sp, "polygons")))
+						{
+						  slot(slot(strata.sp, "polygons")[[i]], "ID") = new_IDs[i]
+						}
+
+						Extrapolation_List$a_el = as.data.frame(matrix(NA,nrow=length(Extrapolation_List$Area_km2_x),ncol=length(strata.sp)+1))
+						colnames(Extrapolation_List$a_el) = c("all_areas",names(strata.sp))
+
+						extrap.points = as.data.frame(input.grid)
+						sp::coordinates(extrap.points) = c("Lon", "Lat")
+			  			sp::proj4string(extrap.points) = sp::proj4string(strata.sp)
+						Extrapolation_List$a_el[,1] = Extrapolation_List$Area_km2_x
+						for(i in 1:length(strata.sp))
+						{
+							Extrapolation_List$a_el[,i+1] = Extrapolation_List$Area_km2_x * ifelse(is.na(sp::over(extrap.points,strata.sp[i])),0,1)
+						} 
+					}
+								 
 
 		# punch-out all extrapolation grid cells that are on land and outside of "data region"
 			extrap.df = as.data.frame(Extrapolation_List$Data_Extrap)
@@ -175,9 +202,9 @@ fit.vast = function(Data_Geostat,RunDir,SaveDir,save.output=FALSE,Q_ik = NULL,vf
 		# with the modified spatial list function be sure to pass to Lon_i and Lat_i the lat and lon transformed to N_km and E_km using Convert_LL_to_EastNorth_Fn.ndd()
 			seed = 123 
 			# ll_to_EN = Convert_LL_to_EastNorth_Fn.ndd( Lon=Data_Geostat[,'Lon'], Lat=Data_Geostat[,'Lat'],crs.en = crs.en,crs.ll = crs.ll)
-			Spatial_List = make_spatial_info.ndd(n_x=n_x, Lon_i=Data_Geostat[,'Lon'], Lat_i=Data_Geostat[,'Lat'], Extrapolation_List = Extrapolation_List, knot_method="grid", Method="Mesh",
+			Spatial_List = FishStatsUtils::make_spatial_info(n_x=n_x, Lon_i=Data_Geostat[,'Lon'], Lat_i=Data_Geostat[,'Lat'], Extrapolation_List = Extrapolation_List, knot_method="grid", Method="Mesh",
 												  grid_size_km=grid_size_km, grid_size_LL=input.grid.res, fine_scale=fine_scale, Network_sz_LL=NULL,
-												  iter.max=1000, randomseed=seed, nstart=100, DirPath=SaveDir, Save_Results=save.output,crs.en = crs.en,crs.ll = crs.ll)
+												  iter.max=1000, randomseed=seed, nstart=100, DirPath=SaveDir, Save_Results=save.output)
 
 			Data_Geostat = cbind(Data_Geostat, knot_i = Spatial_List$knot_i)
 
