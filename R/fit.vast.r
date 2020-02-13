@@ -71,6 +71,7 @@
 #' @importFrom sp over
 #' @importFrom sp spTransform
 #' @importFrom FishStatsUtils make_map_info
+#' @importFrom FishStatsUtils make_covariates
 #' @importFrom FishStatsUtils plot_data
 #' @importFrom FishStatsUtils make_extrapolation_info
 #' @importFrom FishStatsUtils make_spatial_info
@@ -219,7 +220,7 @@ fit.vast = function(Data_Geostat,RunDir,SaveDir,save.output=FALSE,Q_ik = NULL,vf
 	  			X_itp = NULL
 	  			Xconfig_zcp = NULL
 	  		} else {
-	  			enviro.format = make_covariates.ndd(formula = as.formula(enviro[["formula"]]),covariate_data=enviro[["covariate_data"]], Year_i=Data_Geostat[,'Year'], spatial_list=Spatial_List, extrapolation_list=Extrapolation_List)
+	  			enviro.format = FishStatsUtils::make_covariates(formula = as.formula(enviro[["formula"]]),covariate_data=enviro[["covariate_data"]], Year_i=Data_Geostat[,'Year'], spatial_list=Spatial_List, extrapolation_list=Extrapolation_List)
 	  			X_gtp = enviro.format$X_gtp
 	  			X_itp = enviro.format$X_itp
 	  		}
