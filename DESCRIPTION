@@ -1,11 +1,12 @@
 Package: ndd.vast.utils
 Title: Modifications of James-Thorson-NOAA/VAST and James-Thorson-NOAA/FishStatsUtils functions as well as my general utility functions
+Date: 2020-04-02
 Version: 0.0.0.9000
 Authors@R: 
     person(given = "Nicholas",
            family = "Ducharme-Barth",
            role = c("aut", "cre"),
-           email = "nicholas.ducharmebarth@gmail.com")
+           email = "nicholasd@spc.int")
 Description: Modifications of James-Thorson-NOAA/VAST and James-Thorson-NOAA/FishStatsUtils functions so that VAST works for the data and applications that I work with.
 License: GPL-3 + file LICENSE
 Encoding: UTF-8
