@@ -140,7 +140,7 @@ fit.vast = function(Data_Geostat,RunDir,SaveDir,save.output=FALSE,Q_ik = NULL,vf
 	# Jim Thorson uses 110 as the approximation for the number of km in a degree of lat/lon
 			tmp.input.grid = expand.grid(Lat = seq(from=grid_bounds[1],to=grid_bounds[2],by=input.grid.res),
 					Lon = seq(from=grid_bounds[3],to=grid_bounds[4],by=input.grid.res))
-			input.grid = as.matrix(data.frame(Lat = tmp.input.grid$Lat,Lon = tmp.input.grid$Lon, Area_km2=area.cell(lond=tmp.input.grid$Lon,latd=tmp.input.grid$Lat,cell.size=rep(input.grid.res,length(tmp.input.grid$Lon)),crs.ll=crs.ll)))	
+			input.grid = as.matrix(data.frame(Lat = tmp.input.grid$Lat,Lon = tmp.input.grid$Lon, Area_km2=area.cell(lond=tmp.input.grid$Lon,latd=tmp.input.grid$Lat,cell.size=input.grid.res,crs.ll=crs.ll)))	
 			
 			Extrapolation_List = FishStatsUtils::make_extrapolation_info( Region, projargs=crs.en, strata.limits=data.frame('STRATA'="All_areas"),
   															create_strata_per_region=FALSE, input_grid=input.grid, observations_LL=Data_Geostat[,c("Lat","Lon")], 
