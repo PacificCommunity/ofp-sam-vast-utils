@@ -7,9 +7,9 @@
 area.cell(
   lond,
   latd,
-  cell.size = rep(1, length(lond)),
+  cell.size = 1,
   crs.ll = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0",
-  crs.en.type = "albers equal area"
+  crs.en.type = "mollweide"
 )
 }
 \arguments{
@@ -17,11 +17,11 @@ area.cell(
 
 \item{latd}{Vector of latitudes (midpoint of the cell)}
 
-\item{cell.size}{Integer: size of the cell in degrees}
+\item{cell.size}{Integer: size of the cell in degrees. Note, all cells must be the same size}
 
 \item{crs.ll}{Character string of the crs for the current lat-lon projections}
 
-\item{crs.en.type}{What type of projection for calculating the area? 'tpeqd', 'mollweide', or 'albers equal area'. Note that the default 'albers equal area' is hard coded for the central pacific}
+\item{crs.en.type}{What type of projection for calculating the area? 'tpeqd', 'mollweide', or 'albers equal area'. Note that 'albers equal area' is hard coded for the central pacific}
 }
 \value{
 Either a vector of areas in km2
