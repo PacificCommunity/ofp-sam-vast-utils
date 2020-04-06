@@ -100,7 +100,7 @@
 # strata.sp = skj.alt2019.shp
 # enviro=enviro.a
 
-fit.vast = function(Data_Geostat,RunDir,SaveDir,save.output=FALSE,Q_ik = NULL,vf.re = FALSE,FieldConfig=c(Omega1 = 1, Epsilon1 = 1, Omega2 = 1, Epsilon2 = 1),RhoConfig=c(Beta1 = 0, Beta2 = 0, Epsilon1 = 0, Epsilon2 = 0),ObsModel_ez = c(1,3),fine_scale=TRUE,input.grid.res=1,crop.extrap.by.data=TRUE,knot_method = "grid",n_x=100,Version="VAST_v8_3_0",Method="Mesh",ADREPORT=TRUE,normalize_idx=FALSE,Xconfig_zcp=NULL,slim.output=FALSE,strata.sp,enviro)
+fit.vast = function(Data_Geostat,RunDir,SaveDir,save.output=FALSE,Q_ik = NULL,vf.re = FALSE,FieldConfig=c(Omega1 = 1, Epsilon1 = 1, Omega2 = 1, Epsilon2 = 1),RhoConfig=c(Beta1 = 0, Beta2 = 0, Epsilon1 = 0, Epsilon2 = 0),ObsModel_ez = c(1,3),fine_scale=TRUE,input.grid.res=1,crop.extrap.by.data=TRUE,knot_method = "grid",n_x=100,Version="VAST_v8_3_0",Method="Mesh",ADREPORT=TRUE,normalize_idx=FALSE,Xconfig_zcp=NULL,slim.output=FALSE,strata.sp,enviro, newton_steps = 3)
 {
 	A = proc.time()
 
@@ -246,7 +246,7 @@ fit.vast = function(Data_Geostat,RunDir,SaveDir,save.output=FALSE,Q_ik = NULL,vf
 			if(ADREPORT)
 			{
 				Opt = TMBhelper::fit_tmb( obj = Obj, lower = TmbList[["Lower"]], upper = TmbList[["Upper"]],
-				getsd = TRUE, savedir = NULL, bias.correct = FALSE, newtonsteps = 3 )
+				getsd = TRUE, savedir = NULL, bias.correct = FALSE, newtonsteps = newton_steps )
 				Report = Obj$report()
 				Sdreport = TMB::sdreport(Obj)
 				B = proc.time()
@@ -263,11 +263,11 @@ fit.vast = function(Data_Geostat,RunDir,SaveDir,save.output=FALSE,Q_ik = NULL,vf
 						idx.se[,j] = idx.se[,j]/j.mean
 					}
 				}
-				vast_output = list("idx"=idx,"idx.se"=idx.se, "Opt"=Opt, "Report"=Report,"Sdreport" = Sdreport, "TmbData"=TmbData, "Extrapolation_List"=Extrapolation_List, "fit.time"=fit.time,"MapDetails_List"=MapDetails_List )
+				vast_output = list("idx"=idx,"idx.se"=idx.se, "Opt"=Opt, "Report"=Report,"Sdreport" = Sdreport, "TmbData"=TmbData,"Spatial_List"=Spatial_List, "Extrapolation_List"=Extrapolation_List, "fit.time"=fit.time,"MapDetails_List"=MapDetails_List )
 		
 			} else {
 				Opt = TMBhelper::fit_tmb( obj = Obj, lower = TmbList[["Lower"]], upper = TmbList[["Upper"]],
-				getsd = FALSE, savedir = NULL, bias.correct = FALSE, newtonsteps = 3 )
+				getsd = FALSE, savedir = NULL, bias.correct = FALSE, newtonsteps = newton_steps )
 				Report = Obj$report()
 				B = proc.time()
 				fit.time = (B-A)[3]
@@ -276,7 +276,7 @@ fit.vast = function(Data_Geostat,RunDir,SaveDir,save.output=FALSE,Q_ik = NULL,vf
 				{
 					idx = apply(idx,2,function(x)x/mean(x))
 				}
-				vast_output = list("idx"=idx, "Opt"=Opt, "Report"=Report, "TmbData"=TmbData, "Extrapolation_List"=Extrapolation_List, "fit.time"=fit.time,"MapDetails_List"=MapDetails_List )
+				vast_output = list("idx"=idx, "Opt"=Opt, "Report"=Report, "TmbData"=TmbData,"Spatial_List"=Spatial_List, "Extrapolation_List"=Extrapolation_List, "fit.time"=fit.time,"MapDetails_List"=MapDetails_List )
 		
 			}
 
