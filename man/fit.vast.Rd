@@ -27,7 +27,8 @@ fit.vast(
   Xconfig_zcp = NULL,
   slim.output = FALSE,
   strata.sp,
-  enviro
+  enviro,
+  newton_steps = 3
 )
 }
 \arguments{
