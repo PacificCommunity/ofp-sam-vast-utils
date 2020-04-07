@@ -136,8 +136,8 @@ plot.knots = function(vast.output,coast.shp,region.shp.list,save.dir)
 			}
 		}
 		points(points.to.plot,pch=16,cex=0.5,col=scales::alpha(points.to.plot.cols,0.8))
-		sp::plot(region.shp.list,col=NA,border="white",lwd=6,add=TRUE)
-		sp::plot(region.shp.list,col=NA,border="black",lwd=2,add=TRUE)
+		sp::plot(region.shp.list,col=NA,border="white",lwd=8,add=TRUE)
+		sp::plot(region.shp.list,col=NA,border="black",lwd=4,add=TRUE)
 		points(knot.loc,pch=16,cex=2,col="black")
 
 		dev.off()
