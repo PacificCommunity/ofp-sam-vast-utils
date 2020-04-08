@@ -1,6 +1,6 @@
 
 
-# ofp-sam-vast-utils
+# ofp.sam.vast.utils
 
  Modifications of James-Thorson-NOAA/VAST and James-Thorson-NOAA/FishStatsUtils functions so that VAST works for applications using WCPFC tuna fisheries data: standardization of fisheries dependent data across large spatial areas. Also includes some of general utility functions.
 
