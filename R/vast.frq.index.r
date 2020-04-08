@@ -15,7 +15,7 @@
 #' @importFrom data.table as.data.table
 
 
-format.index.frq.vast = function(vast_output,agg.years=1980:1990,ts.vec=seq(from=1952,to=2018.75,by=0.25),region.idx=3:11,region.names=paste0("R",1:length(region.idx)),mean.cv=0.2,missing=0.05,save.dir,save.name)
+vast.frq.index = function(vast_output,agg.years=1980:1990,ts.vec=seq(from=1952,to=2018.75,by=0.25),region.idx=3:11,region.names=paste0("R",1:length(region.idx)),mean.cv=0.2,missing=0.05,save.dir,save.name)
 {
 	# 1) calculate regional weights
 		extrap.info = vast_output$Extrapolation_List$a_el[,region.idx]
