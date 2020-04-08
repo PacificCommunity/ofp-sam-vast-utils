@@ -1,5 +1,5 @@
 Package: ofp.sam.vast.utils
-Title: Modifications of James-Thorson-NOAA/VAST and James-Thorson-NOAA/FishStatsUtils functions as well as general utility functions
+Title: Utility functions for applying VAST to analysis of WCPFC tuna fisheries data.
 Date: 2020-04-02
 Version: 1.1.0
 Authors@R: 
@@ -7,7 +7,7 @@ Authors@R:
            family = "Ducharme-Barth",
            role = c("aut", "cre"),
            email = "nicholasd@spc.int")
-Description: Modifications of James-Thorson-NOAA/VAST and James-Thorson-NOAA/FishStatsUtils functions so that VAST works for the data and applications using WCPFC tuna fisheries data.
+Description: Utility and wrapper functions to accompany the following R packages, James-Thorson-NOAA/VAST and James-Thorson-NOAA/FishStatsUtils, so that VAST works for applications using WCPFC tuna fisheries data: standardization of fisheries dependent data across large spatial areas.
 License: GPL-3 + file LICENSE
 Encoding: UTF-8
 LazyData: false
