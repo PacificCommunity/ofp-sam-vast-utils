@@ -1,5 +1,5 @@
-Package: ndd.vast.utils
-Title: Modifications of James-Thorson-NOAA/VAST and James-Thorson-NOAA/FishStatsUtils functions as well as my general utility functions
+Package: ofp-sam-vast-utils
+Title: Modifications of James-Thorson-NOAA/VAST and James-Thorson-NOAA/FishStatsUtils functions as well as general utility functions
 Date: 2020-04-02
 Version: 1.1.0
 Authors@R: 
@@ -7,7 +7,7 @@ Authors@R:
            family = "Ducharme-Barth",
            role = c("aut", "cre"),
            email = "nicholasd@spc.int")
-Description: Modifications of James-Thorson-NOAA/VAST and James-Thorson-NOAA/FishStatsUtils functions so that VAST works for the data and applications that I work with.
+Description: Modifications of James-Thorson-NOAA/VAST and James-Thorson-NOAA/FishStatsUtils functions so that VAST works for the data and applications using WCPFC tuna fisheries data.
 License: GPL-3 + file LICENSE
 Encoding: UTF-8
 LazyData: false
@@ -33,5 +33,5 @@ Remotes:
 	James-Thorson-NOAA/VAST,
     James-Thorson-NOAA/FishStatsUtils,
     kaskr/TMB_contrib_R/TMBhelper
-URL: https://github.com/N-DucharmeBarth/ndd.vast.utils
-BugReports: https://github.com/N-DucharmeBarth/ndd.vast.utils/issues
+URL: https://github.com/PacificCommunity/ofp-sam-vast-utils
+BugReports: https://github.com/PacificCommunity/ofp-sam-vast-utils/issues
