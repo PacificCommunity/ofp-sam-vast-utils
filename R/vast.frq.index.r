@@ -55,7 +55,7 @@ vast.frq.index = function(vast_output,agg.years=1980:1990,ts.vec=seq(from=1952,t
 		cv = se/idx
 		colnames(cv) = paste0(region.names,"cv")
 
-		agg.mean = apply(idx,2,function(x)mean(x[agg.idx]))
+		agg.mean = apply(idx,2,function(x)mean(x[agg.idx],na.rm=TRUE))
 		idx = do.call("cbind",lapply(1:length(region.idx),function(i) idx[,i]/agg.mean[i]))
 		colnames(idx) = region.names
 
