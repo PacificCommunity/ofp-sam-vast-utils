@@ -25,7 +25,13 @@ Imports:
     abind,
     TMBhelper,
     INLA,
-    splines
+    splines,
+    data.table,
+    raster,
+    scales,
+    magrittr,
+    ggplot2,
+    ggthemes
 Suggests: 
     testthat (>= 2.1.0),
     roxygen2
