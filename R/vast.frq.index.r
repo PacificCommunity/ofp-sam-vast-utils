@@ -65,7 +65,8 @@ vast.frq.index = function(vast_output,agg.years=1980:1990,ts.vec=seq(from=1952,t
 
 	# 3) format idx and penalty weights for frq
 		idx.frq = idx.std
-		colnames(idx.frq)[11:19] = paste0("R",1:9,"penwt")
+		cv.cols = seq(from=length(region.idx)+2,by=1,length.out=length(region.idx))
+		colnames(idx.frq)[cv.cols] = paste0("R",1:length(region.idx),"penwt")
 		# Rescale indices by multiplying by regional weight
 		for(j in 1:length(region.idx))
 		{
@@ -74,7 +75,6 @@ vast.frq.index = function(vast_output,agg.years=1980:1990,ts.vec=seq(from=1952,t
 
 		# Rescale CVs by dividing by the mean over the average period and multiplying by mean.cv
 		# Convert CVs to penalty weights
-		cv.cols = seq(from=length(region.idx)+2,by=1,length.out=length(region.idx))
 
 		idx.frq[,cv.cols] = apply(idx.std[,cv.cols],2,function(x)(x/mean(x[agg.idx],na.rm=TRUE))*mean.cv)
 		for(i in 1:length(cv.cols))
