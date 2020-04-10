@@ -3,8 +3,8 @@
 #' Plot vast output by spatial knots and time block.
 #' 
 #' @param vast.output The output from a fit.vast function call
-#' @param coast.shp supply a coast shapefile, if missing this defaults to the pacific coast shapefile stored in the package
-#' @param region.shp.list supply a shapefile with the regional structure, if missing this defaults to the WCPO skipjack shapefile stored in the package
+#' @param coast.shp supply a coast shapefile, if missing this defaults to the coast shapefile stored in the package
+#' @param region.shp.list supply a shapefile with the regional structure, if missing this defaults to the WCPO 10N shapefile stored in the package
 #' @param species String denoting the species of the analysis
 #' @param plot.type The type of metric to plot 'pred.cpue', 'bin', 'pos', 'resid', 'bin.resid', 'pos.resid' or 'N'
 #' \describe{
@@ -54,14 +54,14 @@ plot.vast.space.time = function(vast.output,coast.shp,region.shp.list,species="B
 
 	if(missing(region.shp.list))
 	{
-		data("skj.alt2019.shp")
-		region.shp.list = skj.alt2019.shp
+		data("wcpo.10N.shp")
+		region.shp.list = wcpo.10N.shp
 	}
 
 	if(missing(coast.shp))
 	{
-		data("pacific.coast")
-		coast.shp = pacific.coast
+		data("coast")
+		coast.shp = coast
 	}
 
 

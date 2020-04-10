@@ -2,8 +2,8 @@
 #' Given fit.vast output, plot the knots and regional structure
 #' 
 #' @param vast.output Output from the fit.vast function where slim output is FALSE
-#' @param coast.shp supply a coast shapefile, if missing this defaults to the pacific coast shapefile stored in the package
-#' @param region.shp.list supply a shapefile with the regional structure, if missing this defaults to the WCPO skipjack shapefile stored in the package
+#' @param coast.shp supply a coast shapefile, if missing this defaults to the coast shapefile stored in the package
+#' @param region.shp.list supply a shapefile with the regional structure, if missing this defaults to the WCPO 10N shapefile stored in the package
 #' @param save.dir directory with the location of where to save the plot
 #' @export
 #' @importFrom data.table data.table
@@ -21,14 +21,14 @@ plot.knots = function(vast.output,coast.shp,region.shp.list,save.dir)
 {
 	if(missing(region.shp.list))
 	{
-		data("skj.alt2019.shp")
-		region.shp.list = skj.alt2019.shp
+		data("wcpo.10N.shp")
+		region.shp.list = wcpo.10N.shp
 	}
 
 	if(missing(coast.shp))
 	{
-		data("pacific.coast")
-		coast.shp = pacific.coast
+		data("coast")
+		coast.shp = coast
 	}
 
 	# pull out quantities and make objects

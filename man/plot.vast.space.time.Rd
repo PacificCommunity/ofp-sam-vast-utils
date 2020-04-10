@@ -24,9 +24,9 @@ plot.vast.space.time(
 \arguments{
 \item{vast.output}{The output from a fit.vast function call}
 
-\item{coast.shp}{supply a coast shapefile, if missing this defaults to the pacific coast shapefile stored in the package}
+\item{coast.shp}{supply a coast shapefile, if missing this defaults to the coast shapefile stored in the package}
 
-\item{region.shp.list}{supply a shapefile with the regional structure, if missing this defaults to the WCPO skipjack shapefile stored in the package}
+\item{region.shp.list}{supply a shapefile with the regional structure, if missing this defaults to the WCPO 10N shapefile stored in the package}
 
 \item{species}{String denoting the species of the analysis}
 
