@@ -110,16 +110,19 @@ plot.knots = function(vast.output,coast.shp,region.shp.list,save.dir)
 			points.to.plot.cols = col.vec[Spatial_List$knot_i]
 	
 	# main plotting
-		if (! dir.exists(save.dir))dir.create(save.dir,recursive=TRUE)
-
+		if(!missing(save.dir))
+		{
+			if (! dir.exists(save.dir))dir.create(save.dir,recursive=TRUE)
+			png(filename=paste0(save.dir,"knots.png"),width = 16, height = 9, res=300 ,units = "in",  bg = "white", type = "windows")
+		}
 			# define plotting window
 				plt.xmin = min(c(raster::extent(region.shp.list)@xmin, min(points.to.plot$Lon), min(knot.loc[,"Lon"])))
 				plt.xmax = max(c(raster::extent(region.shp.list)@xmax, max(points.to.plot$Lon), max(knot.loc[,"Lon"])))
 				plt.ymin = min(c(raster::extent(region.shp.list)@ymin, min(points.to.plot$Lat), min(knot.loc[,"Lat"])))
 				plt.ymax = max(c(raster::extent(region.shp.list)@ymax, max(points.to.plot$Lat), max(knot.loc[,"Lat"])))
 
-		png(filename=paste0(save.dir,"knots.png"),width = 16, height = 9, res=300 ,units = "in",  bg = "white", type = "windows")
-		
+
+
 		plot(points.to.plot,type="n",xlab="",ylab="",xlim=c(plt.xmin,plt.xmax),ylim=c(plt.ymin,plt.ymax),frame.plot=FALSE,axes=FALSE,asp=1)
 		sp::plot(coast.shp,col="gray90",border="gray80",add=TRUE)
 
@@ -140,6 +143,9 @@ plot.knots = function(vast.output,coast.shp,region.shp.list,save.dir)
 		sp::plot(region.shp.list,col=NA,border="black",lwd=4,add=TRUE)
 		points(knot.loc,pch=16,cex=2,col="black")
 
-		dev.off()
+		if(!missing(save.dir))
+		{
+			dev.off()
+		}
 }
 
