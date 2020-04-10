@@ -31,7 +31,8 @@ Imports:
     scales,
     magrittr,
     ggplot2,
-    ggthemes
+    ggthemes,
+    sf
 Suggests: 
     testthat (>= 2.1.0),
     roxygen2

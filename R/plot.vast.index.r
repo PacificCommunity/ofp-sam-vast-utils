@@ -85,6 +85,7 @@ plot.vast.index = function(species,model.name,vast.frq.index,which.idx="idx.std"
 			{
 				stop("How can you save the output if you haven't specified the directory? Please specify save.dir.")
 			} else {
+				if (! dir.exists(save.dir))dir.create(save.dir,recursive=TRUE)
 				ggplot2::ggsave(paste0(save.name,".png"),plot=g, device = "png", path = save.dir,scale = 1, width = 16, height = 9, units = c("in"))
 			}
 		} 
