@@ -32,7 +32,8 @@ Imports:
     magrittr,
     ggplot2,
     ggthemes,
-    sf
+    sf,
+    boot
 Suggests: 
     testthat (>= 2.1.0),
     roxygen2

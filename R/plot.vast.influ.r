@@ -25,6 +25,7 @@
 #' @importFrom ggplot2 geom_smooth
 #' @importFrom ggplot2 ggsave
 #' @importFrom ggplot2 geom_hline
+#' @importFrom boot inv.logit
 
 plot.vast.influ = function(vast.output,model.start.year=1952, coef.names = c("flg.grp","syn.hbf.imb"),level.names = c("Flag group","HBF (pred)"),error.structure = "dln", pt.alpha = 0.2,smooth.span = 0.1,save.dir,save.name)
 # only for objects where Q_ik is estimated
