@@ -30,7 +30,7 @@ plot.vast.space.time(
 
 \item{species}{String denoting the species of the analysis}
 
-\item{plot.type}{The type of metric to plot 'pred.cpue', 'bin', 'pos', 'resid', 'bin.resid', 'pos.resid' or 'N'
+\item{plot.type}{The type of metric to plot 'pred.cpue', 'bin', 'pos', 'resid', 'bin.resid', 'pos.resid', 'N', 'Omega1', 'Omega2','Epsilon1', or 'Epsilon2'
 \describe{
   \item{'obs.cpue'}{Observed nominal cpue by knot and timeblock}
   \item{'pred.cpue'}{Predicted density cpue by knot and timeblock}
@@ -40,6 +40,10 @@ plot.vast.space.time(
   \item{'bin.resid'}{Standardized residual for encounter rate cpue by knot and timeblock}
   \item{'pos.resid'}{Standardized residual for positive catch-rate by knot and timeblock}
   \item{'N'}{Number of observations by knot and timeblock}
+     \item{'Omega1'}{Spatial random effect for encounter rate}
+  \item{'Omega2'}{Spatial random effect for positive catch-rate}
+     \item{'Epsilon1'}{Spatiotemporal random effect for encounter rate}
+  \item{'Epsilon2'}{Spatiotemporal random effect for positive catch-rate}
 }}
 
 \item{model.start.year}{An integer denoting the first year of data used in the model}

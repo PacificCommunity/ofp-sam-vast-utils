@@ -6,7 +6,7 @@
 #' @param coast.shp supply a coast shapefile, if missing this defaults to the coast shapefile stored in the package
 #' @param region.shp.list supply a shapefile with the regional structure, if missing this defaults to the WCPO 10N shapefile stored in the package
 #' @param species String denoting the species of the analysis
-#' @param plot.type The type of metric to plot 'pred.cpue', 'bin', 'pos', 'resid', 'bin.resid', 'pos.resid' or 'N'
+#' @param plot.type The type of metric to plot 'pred.cpue', 'bin', 'pos', 'resid', 'bin.resid', 'pos.resid', 'N', 'Omega1', 'Omega2','Epsilon1', or 'Epsilon2'
 #' \describe{
 #'   \item{'obs.cpue'}{Observed nominal cpue by knot and timeblock}
 #'   \item{'pred.cpue'}{Predicted density cpue by knot and timeblock}
@@ -16,6 +16,10 @@
 #'   \item{'bin.resid'}{Standardized residual for encounter rate cpue by knot and timeblock}
 #'   \item{'pos.resid'}{Standardized residual for positive catch-rate by knot and timeblock}
 #'   \item{'N'}{Number of observations by knot and timeblock}
+#' 	 \item{'Omega1'}{Spatial random effect for encounter rate}
+#'   \item{'Omega2'}{Spatial random effect for positive catch-rate}
+#' 	 \item{'Epsilon1'}{Spatiotemporal random effect for encounter rate}
+#'   \item{'Epsilon2'}{Spatiotemporal random effect for positive catch-rate}
 #' }
 #' @param model.start.year An integer denoting the first year of data used in the model
 #' @param t.block An integer denoting the number of years to aggregate together in time blocks
@@ -73,6 +77,8 @@ plot.vast.space.time = function(vast.output,coast.shp,region.shp.list,species="B
 		D_xy = Report$D_gcy[,1,]
 		R1_xy = Report$R1_gcy[,1,]
 		R2_xy = Report$R2_gcy[,1,]
+		Epsilon1_xy = Report$Epsilon1_gc[,1,]
+		Epsilon2_xy = Report$Epsilon2_gc[,1,]
 
 	# recreate Data_Geostat
 		Data_Geostat = data.table::data.table(obs = TmbData$b_i, ts= as.vector(TmbData$t_iz)+1, knot = Spatial_List$knot_i, a_i = TmbData$a_i)
@@ -140,8 +146,34 @@ plot.vast.space.time = function(vast.output,coast.shp,region.shp.list,species="B
 			dg = Data_Geostat[,.(metric=.N),by=.(time.block,knot)][order(time.block,knot)]
 			plot.title = "Observations per knot"
 			legend.title = "Number of observations"
+		} else if(plot.type == "Omega1"){
+			dg = data.table::data.table(metric=as.vector(Report$Omega1_gc))
+			dg$metric = dg$metric/sd(dg$metric,na.rm=TRUE)
+			dg$knot = 1:nrow(Report$Omega1_gc)
+			dg$time.block = "Omega1"
+			plot.title = "Spatial random effect - Encounter rate"
+			legend.title = "Random effect (Std.)"
+		} else if(plot.type == "Omega2"){
+			dg = data.table::data.table(metric=as.vector(Report$Omega2_gc))
+			dg$metric = dg$metric/sd(dg$metric,na.rm=TRUE)
+			dg$knot = 1:nrow(Report$Omega2_gc)
+			dg$time.block = "Omega2"
+			plot.title = "Spatial random effect - Positive catch-rate"
+			legend.title = "Random effect (Std.)"
+		} else if(plot.type == "Epsilon1"){
+			Data_Geostat$eps1 = sapply(1:nrow(Data_Geostat),function(x)Epsilon1_xy[Data_Geostat$knot[x],Data_Geostat$ts[x]])
+			dg = Data_Geostat[,.(metric=mean(eps1)),by=.(time.block,knot)][order(time.block,knot)]
+			dg$metric = dg$metric/sd(dg$metric,na.rm=TRUE)
+			plot.title = "Spatiotemporal random effect - Encounter rate"
+			legend.title = "Random effect (Std.)"
+		} else if(plot.type == "Epsilon2"){
+			Data_Geostat$eps2 = sapply(1:nrow(Data_Geostat),function(x)Epsilon2_xy[Data_Geostat$knot[x],Data_Geostat$ts[x]])
+			dg = Data_Geostat[,.(metric=mean(eps2)),by=.(time.block,knot)][order(time.block,knot)]
+			dg$metric = dg$metric/sd(dg$metric,na.rm=TRUE)
+			plot.title = "Spatiotemporal random effect - Positive catch-rate"
+			legend.title = "Random effect (Std.)"
 		} else {
-			stop("Bad plot type. Please use either: 'obs.cpue', 'pred.cpue', 'bin', 'pos', 'resid', 'bin.resid', 'pos.resid' or 'N'")
+			stop("Bad plot type. Please use either: 'obs.cpue', 'pred.cpue', 'bin', 'pos', 'resid', 'bin.resid', 'pos.resid', 'N', 'Omega1', 'Omega2','Epsilon1', or 'Epsilon2'")
 		}
 
 		# make plot!
