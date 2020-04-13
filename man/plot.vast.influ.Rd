@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot.vast.influ.r
 \name{plot.vast.influ}
 \alias{plot.vast.influ}
-\title{Influence plot for fitted model from fit.vast}
+\title{Influence plot for fitted model from fit.vast. Currently assumes only one set of interactions and no splines on catchability.}
 \usage{
 plot.vast.influ(
   vast.output,
@@ -36,5 +36,5 @@ plot.vast.influ(
 \item{save.name}{Name stem for the output, useful when saving many model outputs in the same directory}
 }
 \description{
-Influence plot for fitted model from fit.vast
+Influence plot for fitted model from fit.vast. Currently assumes only one set of interactions and no splines on catchability.
 }

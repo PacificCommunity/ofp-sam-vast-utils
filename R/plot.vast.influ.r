@@ -1,5 +1,5 @@
 
-#' Influence plot for fitted model from fit.vast
+#' Influence plot for fitted model from fit.vast. Currently assumes only one set of interactions and no splines on catchability.
 #' 
 #' @param vast.output The output from a fit.vast function call
 #' @param model.start.year An integer denoting the first year of data used in the model

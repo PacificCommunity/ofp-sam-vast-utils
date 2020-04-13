@@ -1,6 +1,6 @@
 
 
-#' Plot estimated catchability effects
+#' Plot estimated catchability effects. Currently assumes only one set of interactions and no splines on catchability.
 #' 
 #' @param vast.output The output from a fit.vast function call
 #' @param coef.names Character vector of the factors used to create Q_ik
@@ -27,6 +27,7 @@
 
 plot.vast.q.estimates = function(vast.output, coef.names = c("flg.grp","syn.hbf.imb"),level.names = c("Flag group","HBF (pred)"),error.structure = "dln",save.dir,save.name)
 # only for objects where Q_ik is estimated
+# also assumes that there are no splines
 # current only supports 1 interaction between factors!!
 {
 	TmbData = vast.output$TmbData

@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot.vast.q.estimates.r
 \name{plot.vast.q.estimates}
 \alias{plot.vast.q.estimates}
-\title{Plot estimated catchability effects}
+\title{Plot estimated catchability effects. Currently assumes only one set of interactions and no splines on catchability.}
 \usage{
 plot.vast.q.estimates(
   vast.output,
@@ -27,5 +27,5 @@ plot.vast.q.estimates(
 \item{save.name}{Name stem for the output, useful when saving many model outputs in the same directory}
 }
 \description{
-Plot estimated catchability effects
+Plot estimated catchability effects. Currently assumes only one set of interactions and no splines on catchability.
 }
