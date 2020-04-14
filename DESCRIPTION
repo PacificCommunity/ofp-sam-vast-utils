@@ -33,7 +33,8 @@ Imports:
     ggplot2,
     ggthemes,
     sf,
-    boot
+    boot,
+    DHARMa
 Suggests: 
     testthat (>= 2.1.0),
     roxygen2

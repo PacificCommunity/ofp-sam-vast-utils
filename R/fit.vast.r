@@ -52,6 +52,8 @@
 #' @param slim.output TRUE or FALSE, if true then vast_output only contains idx and/or idx.se, fit.time, mgc
 #' @param strata.sp [Optional] If present, a shapefile containing the strata boundaries to calculate the indicies for
 #' @param enviro [Optional] If present, a named-list of length two is required: "formula" is a character string that can be coerced to a formula using \code{stats::as.formula}, and "covariate_data" is a data frame with the following columns - Year, Lon, Lat, covariates...
+#' @param newton_steps An integer value (default is 3), the number of newton steps to take after optimization. Leads to a better mgc but is slow. Setting this to zero turns off this feature.
+#' @param n.boot If greater than zero (default is 250), this is the number of replicates to draw from a parametric bootstrap to generate new data from which to calculate DHARMa residuals. 
 #' @return Named list "vast_output"
 #' \describe{
 #'  \item{idx}{the index within each strata if strata is provided}
@@ -80,6 +82,7 @@
 #' @importFrom TMBhelper fit_tmb
 #' @importFrom TMB sdreport
 #' @importFrom TMB summary.sdreport
+#' @importFrom DHARMa createDHARMa
 
 
 ### Function defaults for testing 
@@ -100,7 +103,7 @@
 # strata.sp = skj.alt2019.shp
 # enviro=enviro.a
 
-fit.vast = function(Data_Geostat,RunDir,SaveDir,save.output=FALSE,Q_ik = NULL,vf.re = FALSE,FieldConfig=c(Omega1 = 1, Epsilon1 = 1, Omega2 = 1, Epsilon2 = 1),RhoConfig=c(Beta1 = 0, Beta2 = 0, Epsilon1 = 0, Epsilon2 = 0),ObsModel_ez = c(1,3),fine_scale=TRUE,input.grid.res=1,crop.extrap.by.data=TRUE,knot_method = "grid",n_x=100,Version="VAST_v8_3_0",Method="Mesh",ADREPORT=TRUE,normalize_idx=FALSE,Xconfig_zcp=NULL,slim.output=FALSE,strata.sp,enviro, newton_steps = 3)
+fit.vast = function(Data_Geostat,RunDir,SaveDir,save.output=FALSE,Q_ik = NULL,vf.re = FALSE,FieldConfig=c(Omega1 = 1, Epsilon1 = 1, Omega2 = 1, Epsilon2 = 1),RhoConfig=c(Beta1 = 0, Beta2 = 0, Epsilon1 = 0, Epsilon2 = 0),ObsModel_ez = c(1,3),fine_scale=TRUE,input.grid.res=1,crop.extrap.by.data=TRUE,knot_method = "grid",n_x=100,Version="VAST_v8_3_0",Method="Mesh",ADREPORT=TRUE,normalize_idx=FALSE,Xconfig_zcp=NULL,slim.output=FALSE,strata.sp,enviro, newton_steps = 3,n.boot=250)
 {
 	A = proc.time()
 
@@ -278,6 +281,20 @@ fit.vast = function(Data_Geostat,RunDir,SaveDir,save.output=FALSE,Q_ik = NULL,vf
 				}
 				vast_output = list("idx"=idx, "Opt"=Opt, "Report"=Report, "TmbData"=TmbData,"Spatial_List"=Spatial_List, "Extrapolation_List"=Extrapolation_List, "fit.time"=fit.time,"MapDetails_List"=MapDetails_List )
 		
+			}
+
+			if(n.boot>0)
+			{
+				set.seed(n.boot)
+				Obj$env$data$Options_list$Options['simulate_random_effects'] = FALSE
+				boot.pred = try(replicate(n.boot,Obj$simulate(par=Opt$par, complete=FALSE)$b_i,simplify = TRUE),silent=TRUE)
+				dharma.all = try(DHARMa::createDHARMa(simulatedResponse = boot.pred, observedResponse = Data_Geostat[,'Response_variable']),silent=TRUE)
+				dharma.enc = try(DHARMa::createDHARMa(simulatedResponse = apply(boot.pred,2,function(x)ifelse(x>0,1,0)), observedResponse = ifelse(Data_Geostat[,'Response_variable']>0,1,0),integerResponse = TRUE),silent=TRUE)
+				vast_output$dharma.all = dharma.all
+				vast_output$dharma.enc = dharma.enc
+			} else {
+				vast_output$dharma.all = NA
+				vast_output$dharma.enc = NA
 			}
 
 			if(slim.output)

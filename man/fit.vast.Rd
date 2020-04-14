@@ -28,7 +28,8 @@ fit.vast(
   slim.output = FALSE,
   strata.sp,
   enviro,
-  newton_steps = 3
+  newton_steps = 3,
+  n.boot = 250
 )
 }
 \arguments{
@@ -102,6 +103,10 @@ fit.vast(
 \item{strata.sp}{[Optional] If present, a shapefile containing the strata boundaries to calculate the indicies for}
 
 \item{enviro}{[Optional] If present, a named-list of length two is required: "formula" is a character string that can be coerced to a formula using \code{stats::as.formula}, and "covariate_data" is a data frame with the following columns - Year, Lon, Lat, covariates...}
+
+\item{newton_steps}{An integer value (default is 3), the number of newton steps to take after optimization. Leads to a better mgc but is slow. Setting this to zero turns off this feature.}
+
+\item{n.boot}{If greater than zero (default is 250), this is the number of replicates to draw from a parametric bootstrap to generate new data from which to calculate DHARMa residuals.}
 }
 \value{
 Named list "vast_output"
