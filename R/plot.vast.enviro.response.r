@@ -69,13 +69,13 @@ plot.vast.enviro.response = function(vast.output,enviro.formula,report.enviro,sa
 		rep2 = as.data.frame(rep2)
 
 	# convert to data.table & combine for plotting
-		dep = data.table::as.data.table(dep) %>% data.table::melt(.,measure.vars=c("sst","iso.15"),variable.name = "Covariate")
+		dep = data.table::as.data.table(dep) %>% data.table::melt(.,measure.vars=enviro.factors,variable.name = "Covariate")
 		dep = rbind(dep,dep)
 		dep$Component = c(rep("Encounter probability",n.dep*length(enviro.factors)),rep("Positive catch",n.dep*length(enviro.factors)))
 
-		rep1 = data.table::as.data.table(rep1) %>% data.table::melt(.,measure.vars=c("sst","iso.15"),variable.name = "Covariate",value.name="Response")
+		rep1 = data.table::as.data.table(rep1) %>% data.table::melt(.,measure.vars=enviro.factors,variable.name = "Covariate",value.name="Response")
 		rep1$Component = "Encounter probability"
-		rep2 = data.table::as.data.table(rep2) %>% data.table::melt(.,measure.vars=c("sst","iso.15"),variable.name = "Covariate",value.name="Response")
+		rep2 = data.table::as.data.table(rep2) %>% data.table::melt(.,measure.vars=enviro.factors,variable.name = "Covariate",value.name="Response")
 		rep2$Component = "Positive catch"
 		rep = rbind(rep1,rep2)
 
