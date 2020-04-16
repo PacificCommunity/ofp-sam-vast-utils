@@ -36,9 +36,9 @@ plot.vast.q.estimates = function(vast.output, coef.names = c("flg.grp","syn.hbf.
 	Report = vast.output$Report
 	Q_ik = TmbData$Q_ik
 
-	if(error.structure != "dln")
+	if(!(error.structure %in% c("dln","dg","dp","dnb")))
 	{
-		stop("Not defined for models not using a delta-lognormal error structure")
+		stop("Not defined for models not using logit and log link functions")
 	} else {
 		par.1 = boot::inv.logit(vast.output$Opt$par[grep("lambda1_k",names(vast.output$Opt$par))])
 		par.2 = exp(vast.output$Opt$par[grep("lambda2_k",names(vast.output$Opt$par))])
