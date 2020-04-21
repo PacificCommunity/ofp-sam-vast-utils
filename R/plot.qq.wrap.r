@@ -60,7 +60,7 @@ plot.qq.wrap = function(vast.output,error.structure="dln",nsims=1000,save.dir)
 			        var_y = apply(y, 2, var) ## estimate of variance
 			        stdres = (log(TmbData$b_i[Which]) - mean_y)
 		   		} else if (error.structure == "dg"){
-		   			stop("I lied, I haven't implemented this yet. Try again with error.structure = 'dln'.")
+		   			# stop("I lied, I haven't implemented this yet. Try again with error.structure = 'dln'.")
 		   			gamma.scale = pow(Report$SigmaM[1,1],2) * pred_y;
 		   			mean_y = gamma.scale*(1/pow(sigmaM[i_e,1],2))
          			y = rgamma(n=nsim*length(Which), shape=rep(1/pow(sigmaM[i_e,1],2), each=nsim), scale=gamma.scale)
