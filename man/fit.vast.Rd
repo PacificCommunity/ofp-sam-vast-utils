@@ -28,6 +28,7 @@ fit.vast(
   slim.output = FALSE,
   strata.sp,
   enviro,
+  n_xLOC,
   newton_steps = 3,
   n.boot = 250
 )
@@ -103,6 +104,8 @@ fit.vast(
 \item{strata.sp}{[Optional] If present, a shapefile containing the strata boundaries to calculate the indicies for}
 
 \item{enviro}{[Optional] If present, a named-list of length two is required: "formula" is a character string that can be coerced to a formula using \code{stats::as.formula}, and "covariate_data" is a data frame with the following columns - Year, Lon, Lat, covariates...}
+
+\item{n_xLOC}{[Optional] If present, these are the locations used to define the spatial mesh. This is defined as a matrix with two columns 'Lon' and 'Lat' giving the locations for the knots.}
 
 \item{newton_steps}{An integer value (default is 3), the number of newton steps to take after optimization. Leads to a better mgc but is slow. Setting this to zero turns off this feature.}
 

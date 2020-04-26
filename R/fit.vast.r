@@ -52,6 +52,7 @@
 #' @param slim.output TRUE or FALSE, if true then vast_output only contains idx and/or idx.se, fit.time, mgc
 #' @param strata.sp [Optional] If present, a shapefile containing the strata boundaries to calculate the indicies for
 #' @param enviro [Optional] If present, a named-list of length two is required: "formula" is a character string that can be coerced to a formula using \code{stats::as.formula}, and "covariate_data" is a data frame with the following columns - Year, Lon, Lat, covariates...
+#' @param n_xLOC [Optional] If present, these are the locations used to define the spatial mesh. This is defined as a matrix with two columns 'Lon' and 'Lat' giving the locations for the knots.
 #' @param newton_steps An integer value (default is 3), the number of newton steps to take after optimization. Leads to a better mgc but is slow. Setting this to zero turns off this feature.
 #' @param n.boot If greater than zero (default is 250), this is the number of replicates to draw from a parametric bootstrap to generate new data from which to calculate DHARMa residuals. 
 #' @return Named list "vast_output"
@@ -103,7 +104,7 @@
 # strata.sp = skj.alt2019.shp
 # enviro=enviro.a
 
-fit.vast = function(Data_Geostat,RunDir,SaveDir,save.output=FALSE,Q_ik = NULL,vf.re = FALSE,FieldConfig=c(Omega1 = 1, Epsilon1 = 1, Omega2 = 1, Epsilon2 = 1),RhoConfig=c(Beta1 = 0, Beta2 = 0, Epsilon1 = 0, Epsilon2 = 0),ObsModel_ez = c(1,3),fine_scale=TRUE,input.grid.res=1,crop.extrap.by.data=TRUE,knot_method = "grid",n_x=100,Version="VAST_v8_3_0",Method="Mesh",ADREPORT=TRUE,normalize_idx=FALSE,Xconfig_zcp=NULL,slim.output=FALSE,strata.sp,enviro, newton_steps = 3,n.boot=250)
+fit.vast = function(Data_Geostat,RunDir,SaveDir,save.output=FALSE,Q_ik = NULL,vf.re = FALSE,FieldConfig=c(Omega1 = 1, Epsilon1 = 1, Omega2 = 1, Epsilon2 = 1),RhoConfig=c(Beta1 = 0, Beta2 = 0, Epsilon1 = 0, Epsilon2 = 0),ObsModel_ez = c(1,3),fine_scale=TRUE,input.grid.res=1,crop.extrap.by.data=TRUE,knot_method = "grid",n_x=100,Version="VAST_v8_3_0",Method="Mesh",ADREPORT=TRUE,normalize_idx=FALSE,Xconfig_zcp=NULL,slim.output=FALSE,strata.sp,enviro,n_xLOC, newton_steps = 3,n.boot=250)
 {
 	A = proc.time()
 
@@ -208,9 +209,20 @@ fit.vast = function(Data_Geostat,RunDir,SaveDir,save.output=FALSE,Q_ik = NULL,vf
 		# with the modified spatial list function be sure to pass to Lon_i and Lat_i the lat and lon transformed to N_km and E_km using Convert_LL_to_EastNorth_Fn.ndd()
 			seed = 123 
 			# ll_to_EN = Convert_LL_to_EastNorth_Fn.ndd( Lon=Data_Geostat[,'Lon'], Lat=Data_Geostat[,'Lat'],crs.en = crs.en,crs.ll = crs.ll)
-			Spatial_List = FishStatsUtils::make_spatial_info(n_x=n_x, Lon_i=Data_Geostat[,'Lon'], Lat_i=Data_Geostat[,'Lat'], Extrapolation_List = Extrapolation_List, knot_method="grid", Method="Mesh",
-												  grid_size_km=grid_size_km, grid_size_LL=input.grid.res, fine_scale=fine_scale, Network_sz_LL=NULL,
-												  iter.max=1000, randomseed=seed, nstart=100, DirPath=SaveDir, Save_Results=save.output)
+			if(missing(n_xLOC))
+			{
+				Spatial_List = FishStatsUtils::make_spatial_info(n_x=n_x, Lon_i=Data_Geostat[,'Lon'], Lat_i=Data_Geostat[,'Lat'], Extrapolation_List = Extrapolation_List, knot_method="grid", Method="Mesh",
+								grid_size_km=grid_size_km, grid_size_LL=input.grid.res, fine_scale=fine_scale, Network_sz_LL=NULL,
+								iter.max=1000, randomseed=seed, nstart=100, DirPath=SaveDir, Save_Results=save.output)
+
+			} else {
+				n_x = nrow(n_xLOC)+1
+				Spatial_List = FishStatsUtils::make_spatial_info(n_x=n_x, Lon_i=Data_Geostat[,'Lon'], Lat_i=Data_Geostat[,'Lat'], Extrapolation_List = Extrapolation_List, knot_method="grid", Method="Mesh",
+								grid_size_km=grid_size_km, grid_size_LL=input.grid.res, fine_scale=fine_scale, Network_sz_LL=NULL,
+								iter.max=1000, randomseed=seed, nstart=100, DirPath=SaveDir, Save_Results=save.output,
+								LON_intensity = n_xLOC[,'Lon'],LAT_intensity = n_xLOC[,'Lat'])
+
+			}
 
 			Data_Geostat = cbind(Data_Geostat, knot_i = Spatial_List$knot_i)
 
