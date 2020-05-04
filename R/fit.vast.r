@@ -216,7 +216,7 @@ fit.vast = function(Data_Geostat,RunDir,SaveDir,save.output=FALSE,Q_ik = NULL,vf
 								iter.max=1000, randomseed=seed, nstart=100, DirPath=SaveDir, Save_Results=save.output)
 
 			} else {
-				n_x = nrow(n_xLOC)+1
+				n_x = nrow(n_xLOC)
 				Spatial_List = FishStatsUtils::make_spatial_info(n_x=n_x, Lon_i=Data_Geostat[,'Lon'], Lat_i=Data_Geostat[,'Lat'], Extrapolation_List = Extrapolation_List, knot_method="grid", Method="Mesh",
 								grid_size_km=grid_size_km, grid_size_LL=input.grid.res, fine_scale=fine_scale, Network_sz_LL=NULL,
 								iter.max=1000, randomseed=seed, nstart=100, DirPath=SaveDir, Save_Results=save.output,
