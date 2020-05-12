@@ -299,7 +299,12 @@ fit.vast = function(Data_Geostat,RunDir,SaveDir,save.output=FALSE,Q_ik = NULL,vf
 			{
 				set.seed(n.boot)
 				Obj$env$data$Options_list$Options['simulate_random_effects'] = FALSE
-				boot.pred = try(replicate(n.boot,Obj$simulate(complete=FALSE)$b_i,simplify = TRUE),silent=TRUE)
+				boot.pred = matrix(NA,nrow=nrow(Data_Geostat),ncol=n.boot)
+				for(b in 1:n.boot)
+				{
+					boot.pred[,b] = Obj$simulate(complete=FALSE)$b_i
+				}
+				# boot.pred = try(replicate(n.boot,Obj$simulate(complete=FALSE)$b_i,simplify = TRUE),silent=TRUE)
 				# dharma.all = try(DHARMa::createDHARMa(simulatedResponse = boot.pred, observedResponse = Data_Geostat[,'Response_variable']),silent=TRUE)
 				# dharma.enc = try(DHARMa::createDHARMa(simulatedResponse = apply(boot.pred,2,function(x)ifelse(x>0,1,0)), observedResponse = ifelse(Data_Geostat[,'Response_variable']>0,1,0),integerResponse = TRUE),silent=TRUE)
 				vast_output$boot.pred = boot.pred
