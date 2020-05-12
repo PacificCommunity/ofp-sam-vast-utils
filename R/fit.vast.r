@@ -302,7 +302,7 @@ fit.vast = function(Data_Geostat,RunDir,SaveDir,save.output=FALSE,Q_ik = NULL,vf
 				boot.pred = try(replicate(n.boot,Obj$simulate(complete=FALSE)$b_i,simplify = TRUE),silent=TRUE)
 				# dharma.all = try(DHARMa::createDHARMa(simulatedResponse = boot.pred, observedResponse = Data_Geostat[,'Response_variable']),silent=TRUE)
 				# dharma.enc = try(DHARMa::createDHARMa(simulatedResponse = apply(boot.pred,2,function(x)ifelse(x>0,1,0)), observedResponse = ifelse(Data_Geostat[,'Response_variable']>0,1,0),integerResponse = TRUE),silent=TRUE)
-				vast_output$boot.pred
+				vast_output$boot.pred = boot.pred
 				# vast_output$dharma.enc = dharma.all
 				# vast_output$dharma.enc = dharma.enc
 				# vast_output$boot.pred.bin.prob = try(apply(boot.pred,1,function(x)mean(ifelse(x>0,1,0))),silent=TRUE)
