@@ -83,7 +83,6 @@
 #' @importFrom TMBhelper fit_tmb
 #' @importFrom TMB sdreport
 #' @importFrom TMB summary.sdreport
-#' @importFrom DHARMa createDHARMa
 
 
 ### Function defaults for testing 
