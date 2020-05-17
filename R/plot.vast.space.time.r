@@ -93,7 +93,7 @@ plot.vast.space.time = function(vast.output,coast.shp,region.shp.list,species="B
 		Data_Geostat$qtr = ((Data_Geostat$yr.qtr %% 1)*4)+1
 		Data_Geostat$obs.bin = ifelse(Data_Geostat$obs>0,1,0)
 
-	if(length(vast.output$boot.pred)!=1)
+	if(length(vast.output$boot.pred)>1)
 	{
 		Data_Geostat$pred.both = rowMeans(vast.output$boot.pred)
 		Data_Geostat$pred.bin = apply(vast.output$boot.pred,1,function(x)mean(ifelse(x==0,0,1)))
@@ -132,7 +132,7 @@ plot.vast.space.time = function(vast.output,coast.shp,region.shp.list,species="B
 		}else if(plot.type == "resid"){
 			Data_Geostat$knot.pred = sapply(1:nrow(Data_Geostat),function(x)D_xy[Data_Geostat$knot[x],Data_Geostat$ts[x]])
 			Data_Geostat$pred.density = Data_Geostat$knot.pred*Data_Geostat$a_i
-			if(length(vast.output$boot.pred)!=1)
+			if(length(vast.output$boot.pred)>1)
 			{
 				dg = Data_Geostat[,.(metric=mean(obs-pred.both)),by=.(time.block,knot)][order(time.block,knot)]
 				dg$metric = dg$metric/sd(dg$metric,na.rm=TRUE)
@@ -144,7 +144,7 @@ plot.vast.space.time = function(vast.output,coast.shp,region.shp.list,species="B
 			legend.title = "Std. Residual (Obs - Pred)"
 		}else if(plot.type == "bin.resid"){
 			Data_Geostat$knot.bin = sapply(1:nrow(Data_Geostat),function(x)R1_xy[Data_Geostat$knot[x],Data_Geostat$ts[x]])
-			if(length(vast.output$boot.pred)!=1)
+			if(length(vast.output$boot.pred)>1)
 			{
 				dg = Data_Geostat[,.(metric=mean(obs.bin-pred.bin)),by=.(time.block,knot)][order(time.block,knot)]
 				dg$metric = dg$metric/sd(dg$metric,na.rm=TRUE)
@@ -157,7 +157,7 @@ plot.vast.space.time = function(vast.output,coast.shp,region.shp.list,species="B
 		}else if(plot.type == "pos.resid"){
 			Data_Geostat$knot.pos = sapply(1:nrow(Data_Geostat),function(x)R2_xy[Data_Geostat$knot[x],Data_Geostat$ts[x]])
 			Data_Geostat$pos.density = Data_Geostat$knot.pos*Data_Geostat$a_i
-			if(length(vast.output$boot.pred)!=1)
+			if(length(vast.output$boot.pred)>1)
 			{
 				dg = Data_Geostat[obs.bin==1,.(metric=mean(obs-pred.pos)),by=.(time.block,knot)][order(time.block,knot)]
 				dg$metric = dg$metric/sd(dg$metric,na.rm=TRUE)
