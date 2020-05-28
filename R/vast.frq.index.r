@@ -76,6 +76,7 @@ vast.frq.index = function(vast_output,agg.years=NULL,ts.vec=seq(from=1952,to=201
 
 			idx.frq = cbind(idx,cv)
 			idx.frq = cbind(ts.vec,idx.frq)
+			colnames(idx.frq)[1] = "yrqtr"
 			cv.cols = seq(from=length(region.idx)+2,by=1,length.out=length(region.idx))
 			colnames(idx.frq)[cv.cols] = paste0("R",1:length(region.idx),"penwt")
 
