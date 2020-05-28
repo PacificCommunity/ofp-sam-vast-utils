@@ -6,7 +6,7 @@
 \usage{
 vast.frq.index(
   vast_output,
-  agg.years = 1980:1990,
+  agg.years = NULL,
   ts.vec = seq(from = 1952, to = 2018.75, by = 0.25),
   region.idx = 3:11,
   region.names = paste0("R", 1:length(region.idx)),

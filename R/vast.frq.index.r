@@ -15,74 +15,151 @@
 #' @importFrom data.table as.data.table
 
 
-vast.frq.index = function(vast_output,agg.years=1980:1990,ts.vec=seq(from=1952,to=2018.75,by=0.25),region.idx=3:11,region.names=paste0("R",1:length(region.idx)),mean.cv=0.2,missing=0.05,save.dir,save.name)
+vast.frq.index = function(vast_output,agg.years=NULL,ts.vec=seq(from=1952,to=2018.75,by=0.25),region.idx=3:11,region.names=paste0("R",1:length(region.idx)),mean.cv=0.2,missing=0.05,save.dir,save.name)
 {
-	# 1) calculate regional weights
-		extrap.info = vast_output$Extrapolation_List$a_el[,region.idx]
-		colnames(extrap.info) = region.names
-		extrap.info$knot = vast_output$Spatial_List$NN_Extrap$nn.idx
-		extrap.info = data.table::as.data.table(extrap.info)
+	if(is.null(agg.years))
+	{
+		# 1) calculate regional weights
+			extrap.info = vast_output$Extrapolation_List$a_el[,region.idx]
+			colnames(extrap.info) = region.names
+			extrap.info$knot = vast_output$Spatial_List$NN_Extrap$nn.idx
+			extrap.info = data.table::as.data.table(extrap.info)
 
-		D_yx = t(vast_output$Report$D_gcy[,1,])
+			D_yx = t(vast_output$Report$D_gcy[,1,])
 
-		# create matrix of density in each region over time (area for each knot in each region times the density at the knot and time)
-		reg.wt = matrix(NA,nrow=length(ts.vec),ncol=length(region.names))
-		colnames(reg.wt) = region.names
+			# create matrix of density in each region over time (area for each knot in each region times the density at the knot and time)
+			reg.wt = matrix(NA,nrow=length(ts.vec),ncol=length(region.names))
+			colnames(reg.wt) = region.names
 
-			for(j in 1:length(region.names))
-			{
-				tmp.dt = extrap.info[,c(region.names[j],"knot"),with=FALSE] 
-				colnames(tmp.dt) = c("reg","knot")
-				reg.knot.area = as.matrix(tmp.dt[,.(Area_km2_x=sum(reg)),by=knot][order(knot)])
-
-				for(i in 1:length(ts.vec))
+				for(j in 1:length(region.names))
 				{
-					reg.wt[i,j] = sum(D_yx[i,] * reg.knot.area[,"Area_km2_x"])
+					tmp.dt = extrap.info[,c(region.names[j],"knot"),with=FALSE] 
+					colnames(tmp.dt) = c("reg","knot")
+					reg.knot.area = as.matrix(tmp.dt[,.(Area_km2_x=sum(reg)),by=knot][order(knot)])
+
+					for(i in 1:length(ts.vec))
+					{
+						reg.wt[i,j] = sum(D_yx[i,] * reg.knot.area[,"Area_km2_x"])
+					}
+
+					rm(list=c("tmp.dt","reg.knot.area"))
 				}
 
-				rm(list=c("tmp.dt","reg.knot.area"))
+			# calculate regional weight as average density over the whole model period
+			reg.wt = colMeans(reg.wt)
+			reg.wt = reg.wt/sum(reg.wt)
+			names(reg.wt) = region.names
+
+		# 2) format idx and cv
+			idx = vast_output$idx[,region.idx]
+			se = vast_output$idx.se[,region.idx]
+			cv = se/idx
+			colnames(cv) = paste0(region.names,"cv")
+
+			reg.mean = apply(idx,2,function(x)mean(x,na.rm=TRUE))
+			idx = do.call("cbind",lapply(1:length(region.idx),function(i) idx[,i]/reg.mean[i]))
+			colnames(idx) = region.names
+
+			idx.std = cbind(idx,cv)
+			idx.std = cbind(ts.vec,idx.std)
+			colnames(idx.std)[1] = "yrqtr"
+			rm(list=c("idx","se","cv"))
+		# 3) format idx and penalty weights for frq
+			idx = vast_output$idx[,region.idx]
+			se = vast_output$idx.se[,region.idx]
+			cv = se/idx
+			colnames(cv) = paste0(region.names,"cv")
+
+			global.mean = mean(idx,na.rm=TRUE)
+			idx = do.call("cbind",lapply(1:length(region.idx),function(i) idx[,i]/global.mean))
+			colnames(idx) = region.names
+
+			idx.frq = cbind(idx,cv)
+			idx.frq = cbind(ts.vec,idx.frq)
+			cv.cols = seq(from=length(region.idx)+2,by=1,length.out=length(region.idx))
+			colnames(idx.frq)[cv.cols] = paste0("R",1:length(region.idx),"penwt")
+
+			# Rescale CVs by dividing by the mean over the model period and multiplying by mean.cv
+			# Convert CVs to penalty weights
+			global.cv = mean(cv,na.rm=TRUE)
+			idx.frq[,cv.cols] = apply(idx.std[,cv.cols],2,function(x)(x/global.cv)*mean.cv)
+			for(i in 1:length(cv.cols))
+			{
+			    idx.frq[,cv.cols[i]] = round(1/(2 * (idx.frq[,cv.cols[i]]^2)),3)
+			    idx.frq[,cv.cols[i]] = ifelse(is.infinite(idx.frq[,cv.cols[i]]),missing,idx.frq[,cv.cols[i]])
+				idx.frq[,cv.cols[i]] = ifelse(idx.frq[,cv.cols[i]]<1,missing,idx.frq[,cv.cols[i]])
 			}
 
-		agg.idx = which(floor(ts.vec) %in% agg.years)
-		# calculate regional weight as average density over the agg.years period
-		reg.wt = colMeans(reg.wt[agg.idx,])
-		reg.wt = reg.wt/sum(reg.wt)
-		names(reg.wt) = region.names
+	} else {
+		# 1) calculate regional weights
+			extrap.info = vast_output$Extrapolation_List$a_el[,region.idx]
+			colnames(extrap.info) = region.names
+			extrap.info$knot = vast_output$Spatial_List$NN_Extrap$nn.idx
+			extrap.info = data.table::as.data.table(extrap.info)
 
-	# 2) format idx and cv
-		idx = vast_output$idx[,region.idx]
-		se = vast_output$idx.se[,region.idx]
-		cv = se/idx
-		colnames(cv) = paste0(region.names,"cv")
+			D_yx = t(vast_output$Report$D_gcy[,1,])
 
-		agg.mean = apply(idx,2,function(x)mean(x[agg.idx],na.rm=TRUE))
-		idx = do.call("cbind",lapply(1:length(region.idx),function(i) idx[,i]/agg.mean[i]))
-		colnames(idx) = region.names
+			# create matrix of density in each region over time (area for each knot in each region times the density at the knot and time)
+			reg.wt = matrix(NA,nrow=length(ts.vec),ncol=length(region.names))
+			colnames(reg.wt) = region.names
 
-		idx.std = cbind(idx,cv)
-		idx.std = cbind(ts.vec,idx.std)
-		colnames(idx.std)[1] = "yrqtr"
+				for(j in 1:length(region.names))
+				{
+					tmp.dt = extrap.info[,c(region.names[j],"knot"),with=FALSE] 
+					colnames(tmp.dt) = c("reg","knot")
+					reg.knot.area = as.matrix(tmp.dt[,.(Area_km2_x=sum(reg)),by=knot][order(knot)])
 
-	# 3) format idx and penalty weights for frq
-		idx.frq = idx.std
-		cv.cols = seq(from=length(region.idx)+2,by=1,length.out=length(region.idx))
-		colnames(idx.frq)[cv.cols] = paste0("R",1:length(region.idx),"penwt")
-		# Rescale indices by multiplying by regional weight
-		for(j in 1:length(region.idx))
-		{
-			idx.frq[,j+1] = idx.frq[,j+1] * reg.wt[j] 
-		}
+					for(i in 1:length(ts.vec))
+					{
+						reg.wt[i,j] = sum(D_yx[i,] * reg.knot.area[,"Area_km2_x"])
+					}
 
-		# Rescale CVs by dividing by the mean over the average period and multiplying by mean.cv
-		# Convert CVs to penalty weights
+					rm(list=c("tmp.dt","reg.knot.area"))
+				}
 
-		idx.frq[,cv.cols] = apply(idx.std[,cv.cols],2,function(x)(x/mean(x[agg.idx],na.rm=TRUE))*mean.cv)
-		for(i in 1:length(cv.cols))
-		{
-		    idx.frq[,cv.cols[i]] = round(1/(2 * (idx.frq[,cv.cols[i]]^2)),3)
-		    idx.frq[,cv.cols[i]] = ifelse(is.infinite(idx.frq[,cv.cols[i]]),missing,idx.frq[,cv.cols[i]])
-			idx.frq[,cv.cols[i]] = ifelse(idx.frq[,cv.cols[i]]<1,missing,idx.frq[,cv.cols[i]])
-		}
+			agg.idx = which(floor(ts.vec) %in% agg.years)
+			# calculate regional weight as average density over the agg.years period
+			reg.wt = colMeans(reg.wt[agg.idx,])
+			reg.wt = reg.wt/sum(reg.wt)
+			names(reg.wt) = region.names
+
+		# 2) format idx and cv
+			idx = vast_output$idx[,region.idx]
+			se = vast_output$idx.se[,region.idx]
+			cv = se/idx
+			colnames(cv) = paste0(region.names,"cv")
+
+			agg.mean = apply(idx,2,function(x)mean(x[agg.idx],na.rm=TRUE))
+			idx = do.call("cbind",lapply(1:length(region.idx),function(i) idx[,i]/agg.mean[i]))
+			colnames(idx) = region.names
+
+			idx.std = cbind(idx,cv)
+			idx.std = cbind(ts.vec,idx.std)
+			colnames(idx.std)[1] = "yrqtr"
+
+		# 3) format idx and penalty weights for frq
+			idx.frq = idx.std
+			cv.cols = seq(from=length(region.idx)+2,by=1,length.out=length(region.idx))
+			colnames(idx.frq)[cv.cols] = paste0("R",1:length(region.idx),"penwt")
+			# Rescale indices by multiplying by regional weight
+			for(j in 1:length(region.idx))
+			{
+				idx.frq[,j+1] = idx.frq[,j+1] * reg.wt[j] 
+			}
+
+			# Rescale CVs by dividing by the mean over the average period and multiplying by mean.cv
+			# Convert CVs to penalty weights
+
+			idx.frq[,cv.cols] = apply(idx.std[,cv.cols],2,function(x)(x/mean(x[agg.idx],na.rm=TRUE))*mean.cv)
+			for(i in 1:length(cv.cols))
+			{
+			    idx.frq[,cv.cols[i]] = round(1/(2 * (idx.frq[,cv.cols[i]]^2)),3)
+			    idx.frq[,cv.cols[i]] = ifelse(is.infinite(idx.frq[,cv.cols[i]]),missing,idx.frq[,cv.cols[i]])
+				idx.frq[,cv.cols[i]] = ifelse(idx.frq[,cv.cols[i]]<1,missing,idx.frq[,cv.cols[i]])
+			}
+
+	}
+
 
 	# write.out
 		if(!missing(save.dir))
