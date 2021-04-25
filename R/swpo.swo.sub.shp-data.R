@@ -1,0 +1,2 @@
+#' A SpatialPolygons object containing the boundaries of the model sub-regions of the fisheries structure for the 2021 southwest Pacific Ocean (SWPO) swordfish (SWO) stock assessment 
+"swpo.swo.sub.shp"

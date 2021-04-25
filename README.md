@@ -8,4 +8,5 @@
  
 Versions 1.1.0 & 1.2.0 contain the accesory functions used to create the standardized CPUE for the 2020 WCPFC stock assessments of BET and YFT. The utility functions are meant to interface with James-Thorson-NOAA/VAST (3.3.0) and James-Thorson-NOAA/FishStatsUtils (2.5.0). 
 
+Versions 1.3.0 contain the accesory functions used to create the standardized CPUE for the 2021 WCPFC stock assessments southwest Pacific Ocean swordfish. The utility functions are meant to interface with James-Thorson-NOAA/VAST (3.7.1) and James-Thorson-NOAA/FishStatsUtils (2.9.1). 
 

@@ -1,7 +1,7 @@
 Package: ofp.sam.vast.utils
 Title: Utility functions for applying VAST to analysis of WCPFC tuna fisheries data.
 Date: 2020-04-02
-Version: 1.1.0
+Version: 1.3.0
 Authors@R: 
     person(given = "Nicholas",
            family = "Ducharme-Barth",
