@@ -2,10 +2,10 @@
 
 #' Format the estimated index for use in MFCL
 #' 
-#' @param vast_output Output from a call to fit.vast where slim output is FALSE
+#' @param vast_output Output from a call to FishStatsUtils::fit_model
 #' @param agg.years Years used to define the average period when rescaling
 #' @param ts.vec a vector denoting the year-quarter of each ts for the fit.vast model output
-#' @param region.idx The fit.vast model can calculate the abundance trends over many regions, some of which are superfluous. Specify the column index for the regions that you care about.
+#' @param region.idx The fit_model model can calculate the abundance trends over many regions, some of which are superfluous. Specify the column index for the regions that you care about.
 #' @param region.names What should these regions be called? A character vector of names please
 #' @param mean.cv When rescaling the CV for MFCL, set the mean cv to rescale to.
 #' @param missing If the cv is missing for some reason (a hold over from the conventional delta-glm) set the penalty weight to this value. The smaller the value, the smaller the impact of this data point on the likelihood in MFCL.
@@ -15,17 +15,36 @@
 #' @importFrom data.table as.data.table
 
 
-vast.frq.index = function(vast_output,agg.years=NULL,ts.vec=seq(from=1952,to=2018.75,by=0.25),region.idx=3:11,region.names=paste0("R",1:length(region.idx)),mean.cv=0.2,missing=0.05,save.dir,save.name)
+vast.frq.index = function(vast_output,agg.years=NULL,ts.vec=seq(from=2004.25,to=2019.75,by=0.25),region.idx=3:4,region.names=paste0("R",1:length(region.idx)),mean.cv=0.2,missing=0.05,save.dir,save.name)
 {
+	# add functionality for fine_scale == TRUE/FALSE since this will change D_gct dimensions...
+	if(vast_output$spatial_list$fine_scale)
+	{
+		stop('This function has not developed the functionality to process output from a model where fine_scale is TRUE.')
+	}
+
+	# not defined for multi-category/species
+	if(vast_output$data_list$n_c>1)
+	{
+		stop('This function has not developed the functionality to process output from a model with multiple categories/species.')
+	}
+
+	# check for idx and idx.se; if they don't exist then create them
+	if(!("idx" %in% names(vast_output)))
+	{
+		vast_output$idx = vast_output$Report$Index_ctl[1,,]
+		vast_output$idx.se = array( TMB::summary.sdreport(vast_output$Sdreport)[which(rownames(TMB::summary.sdreport(vast_output$Sdreport))=="Index_ctl"),2], dim=c(dim(vast_output$Report$Index_ctl)), dimnames=list(NULL,NULL,NULL) )[1,,]
+	}
+
 	if(is.null(agg.years))
 	{
 		# 1) calculate regional weights
-			extrap.info = vast_output$Extrapolation_List$a_el[,region.idx]
+			extrap.info = vast_output$extrapolation_list$a_el[,region.idx]
 			colnames(extrap.info) = region.names
-			extrap.info$knot = vast_output$Spatial_List$NN_Extrap$nn.idx
+			extrap.info$knot = vast_output$spatial_list$NN_Extrap$nn.idx
 			extrap.info = data.table::as.data.table(extrap.info)
 
-			D_yx = t(vast_output$Report$D_gcy[,1,])
+			D_yx = t(vast_output$Report$D_gct[,1,])
 
 			# create matrix of density in each region over time (area for each knot in each region times the density at the knot and time)
 			reg.wt = matrix(NA,nrow=length(ts.vec),ncol=length(region.names))

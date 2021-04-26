@@ -7,8 +7,8 @@
 vast.frq.index(
   vast_output,
   agg.years = NULL,
-  ts.vec = seq(from = 1952, to = 2018.75, by = 0.25),
-  region.idx = 3:11,
+  ts.vec = seq(from = 2004.25, to = 2019.75, by = 0.25),
+  region.idx = 3:4,
   region.names = paste0("R", 1:length(region.idx)),
   mean.cv = 0.2,
   missing = 0.05,
@@ -17,13 +17,13 @@ vast.frq.index(
 )
 }
 \arguments{
-\item{vast_output}{Output from a call to fit.vast where slim output is FALSE}
+\item{vast_output}{Output from a call to FishStatsUtils::fit_model}
 
 \item{agg.years}{Years used to define the average period when rescaling}
 
 \item{ts.vec}{a vector denoting the year-quarter of each ts for the fit.vast model output}
 
-\item{region.idx}{The fit.vast model can calculate the abundance trends over many regions, some of which are superfluous. Specify the column index for the regions that you care about.}
+\item{region.idx}{The fit_model model can calculate the abundance trends over many regions, some of which are superfluous. Specify the column index for the regions that you care about.}
 
 \item{region.names}{What should these regions be called? A character vector of names please}
 

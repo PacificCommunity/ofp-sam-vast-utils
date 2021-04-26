@@ -1,6 +1,6 @@
 Package: ofp.sam.vast.utils
 Title: Utility functions for applying VAST to analysis of WCPFC tuna fisheries data.
-Date: 2020-04-02
+Date: 2021-04-26
 Version: 1.3.0
 Authors@R: 
     person(given = "Nicholas",
@@ -11,20 +11,13 @@ Description: Utility and wrapper functions to accompany the following R packages
 License: GPL-3 + file LICENSE
 Encoding: UTF-8
 LazyData: false
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.1
 Depends:
 	R (>= 3.6.1) 
 Imports:
     rgeos,
     sp,
     rgdal,
-    TMB,
-    VAST,
-    FishStatsUtils,
-    RANN,
-    abind,
-    TMBhelper,
-    INLA,
     splines,
     data.table,
     raster,
@@ -33,8 +26,7 @@ Imports:
     ggplot2,
     ggthemes,
     sf,
-    boot,
-    DHARMa
+    boot
 Suggests: 
     testthat (>= 2.1.0),
     roxygen2

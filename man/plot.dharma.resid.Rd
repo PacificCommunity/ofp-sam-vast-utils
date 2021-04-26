@@ -12,9 +12,9 @@ plot.dharma.resid(
   palette.cols = c("royalblue3", "deepskyblue1", "gold", "orange1", "indianred1",
     "firebrick2", "#AC2020"),
   smooth.span = 0.1,
-  ts.start = 1952,
+  ts.start = 2004,
   ts.step = 0.25,
-  factor.grouping = 5,
+  factor.grouping = 2,
   save.dir,
   save.name
 )

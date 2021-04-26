@@ -4,7 +4,9 @@
 \name{po.all}
 \alias{po.all}
 \title{A SpatialPolygons object containing the approximate boundaries of the Pacific basin}
-\format{An object of class \code{SpatialPolygons} of length 1.}
+\format{
+An object of class \code{SpatialPolygons} of length 1.
+}
 \usage{
 po.all
 }

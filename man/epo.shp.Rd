@@ -4,7 +4,9 @@
 \name{epo.shp}
 \alias{epo.shp}
 \title{A SpatialPolygons object containing the boundaries of the model regions of for the EPO used in the 2015 WCPFC Pacific-wide BET stock assessment}
-\format{An object of class \code{SpatialPolygons} of length 3.}
+\format{
+An object of class \code{SpatialPolygons} of length 3.
+}
 \usage{
 epo.shp
 }

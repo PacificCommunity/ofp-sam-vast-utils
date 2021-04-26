@@ -4,7 +4,9 @@
 \name{wcpo.20N.shp}
 \alias{wcpo.20N.shp}
 \title{A SpatialPolygons object containing the boundaries of the model regions of the 20N regional structure for the 2020 BET & YFT WCPFC stock assessments}
-\format{An object of class \code{SpatialPolygons} of length 9.}
+\format{
+An object of class \code{SpatialPolygons} of length 9.
+}
 \usage{
 wcpo.20N.shp
 }

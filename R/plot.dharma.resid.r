@@ -40,15 +40,15 @@
 #' @importFrom ggplot2 geom_sf
 #' @importFrom ggplot2 coord_sf
 #' @importFrom sf st_as_sf
-#' @importFrom DHARMa createDHARMa
 
 
 
 
-plot.dharma.resid = function(vast.output,n.samp=999999,seed=123,plot.type="all",palette.cols = c("royalblue3","deepskyblue1","gold","orange1","indianred1","firebrick2","#AC2020"),smooth.span=0.1,ts.start=1952,ts.step=0.25,factor.grouping=5,save.dir,save.name)
+plot.dharma.resid = function(vast.output,n.samp=999999,seed=123,plot.type="all",palette.cols = c("royalblue3","deepskyblue1","gold","orange1","indianred1","firebrick2","#AC2020"),smooth.span=0.1,ts.start=2004,ts.step=0.25,factor.grouping=2,save.dir,save.name)
 {
 	set.seed(seed)
-	d.all = try(DHARMa::createDHARMa(simulatedResponse = vast.output$boot.pred, observedResponse = vast.output$TmbData$b_i),silent=TRUE)
+	# use PIT residuals calculated by VAST packaged
+	# d.all = try(DHARMa::createDHARMa(simulatedResponse = vast.output$boot.pred, observedResponse = vast.output$TmbData$b_i),silent=TRUE)
 	t_i = as.vector(vast.output$TmbData$t_iz) + 1 # ts vec
 	k_i = data.table::data.table(knot=vast.output$Spatial_List$knot_i,lon=vast.output$Spatial_List$latlon_i[,2],lat=vast.output$Spatial_List$latlon_i[,1]) # knot vec
 	n.obs = d.all$nObs

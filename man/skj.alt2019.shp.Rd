@@ -4,7 +4,9 @@
 \name{skj.alt2019.shp}
 \alias{skj.alt2019.shp}
 \title{A SpatialPolygons object containing the boundaries of the model regions of the diagnostic case from the 2019 WCPFC skipjack stock assessment}
-\format{An object of class \code{SpatialPolygons} of length 8.}
+\format{
+An object of class \code{SpatialPolygons} of length 8.
+}
 \usage{
 skj.alt2019.shp
 }
