@@ -2,7 +2,8 @@
 
 #' Plot DHARMa style residuals for VAST model.
 #' 
-#' @param vast.output The output from a fit.vast function call
+#' @param vast_output Output from a call to FishStatsUtils::fit_model
+#' @param residuals_summary Output from summary() applied to output from FishStatsUtils::fit_model when argument 'what' = "residuals"
 #' @param n.samp Integer giving the number of records to plot the QQ relationship. Default is to use everyting.
 #' @param seed The random seed for the subsampling
 #' @param plot.type The type of metric to plot 'all', 'time', or 'knot', if you want to plot QQ by factor.
@@ -44,14 +45,13 @@
 
 
 
-plot.dharma.resid = function(vast.output,n.samp=999999,seed=123,plot.type="all",palette.cols = c("royalblue3","deepskyblue1","gold","orange1","indianred1","firebrick2","#AC2020"),smooth.span=0.1,ts.start=2004,ts.step=0.25,factor.grouping=2,save.dir,save.name)
+plot.dharma.resid = function(vast_output,residuals_summary,n.samp=999999,seed=123,plot.type="all",palette.cols = c("royalblue3","deepskyblue1","gold","orange1","indianred1","firebrick2","#AC2020"),smooth.span=0.1,ts.start=2004,ts.step=0.25,factor.grouping=2,save.dir,save.name)
 {
 	set.seed(seed)
-	# use PIT residuals calculated by VAST packaged
-	# d.all = try(DHARMa::createDHARMa(simulatedResponse = vast.output$boot.pred, observedResponse = vast.output$TmbData$b_i),silent=TRUE)
-	t_i = as.vector(vast.output$TmbData$t_iz) + 1 # ts vec
-	k_i = data.table::data.table(knot=vast.output$Spatial_List$knot_i,lon=vast.output$Spatial_List$latlon_i[,2],lat=vast.output$Spatial_List$latlon_i[,1]) # knot vec
-	n.obs = d.all$nObs
+	# use PIT residuals calculated by VAST package
+	t_i = as.vector(vast_output$data_frame$t_i) # ts vec
+	k_i = data.table::data.table(knot=vast_output$spatial_list$knot_i,lon=vast_output$spatial_list$latlon_i[,2],lat=vast_output$spatial_list$latlon_i[,1]) # knot vec
+	n.obs = residuals_summary$nObs
 	if (! dir.exists(save.dir))dir.create(save.dir,recursive=TRUE)
 
 
@@ -60,16 +60,16 @@ plot.dharma.resid = function(vast.output,n.samp=999999,seed=123,plot.type="all",
 		if(n.samp<n.obs)
 		{
 			which.keep = sample(1:n.obs,n.samp)
-			d.all$nObs = n.samp
-			d.all$simulatedResponse = d.all$simulatedResponse[which.keep,]
-			d.all$observedResponse = d.all$observedResponse[which.keep]
-			d.all$scaledResiduals = d.all$scaledResiduals[which.keep]
-			d.all$fittedPredictedResponse = d.all$fittedPredictedResponse[which.keep]
+			residuals_summary$nObs = n.samp
+			residuals_summary$simulatedResponse = residuals_summary$simulatedResponse[which.keep,]
+			residuals_summary$observedResponse = residuals_summary$observedResponse[which.keep]
+			residuals_summary$scaledResiduals = residuals_summary$scaledResiduals[which.keep]
+			residuals_summary$fittedPredictedResponse = residuals_summary$fittedPredictedResponse[which.keep]
 			t_i = t_i[which.keep]
 			k_i = k_i[which.keep,]
 		}
 
-		g.dt = data.table::data.table(expected=sort((1:d.all$nObs)/(d.all$nObs + 1)),observed=sort(d.all$scaledResiduals))
+		g.dt = data.table::data.table(expected=sort((1:residuals_summary$nObs)/(residuals_summary$nObs + 1)),observed=sort(residuals_summary$scaledResiduals))
 		tmp.ks = suppressWarnings(ks.test(g.dt$observed, 'punif', alternative = "two.sided"))
 		test.dt = data.table::data.table(p.value=round(tmp.ks$p.value, digits = 3),deviation=ifelse(tmp.ks$p.value < 0.05, "significant", "n.s."))
 		test.dt$label = paste0("KS p-value: ",test.dt$p.value)
@@ -78,7 +78,7 @@ plot.dharma.resid = function(vast.output,n.samp=999999,seed=123,plot.type="all",
 		ggplot2::ggplot() + ggthemes::theme_few() +
 		ggplot2::xlab("Expected") +
 		ggplot2::ylab("Observed") +
-		ggplot2::ggtitle(paste0("QQ plot: ",round((d.all$nObs/n.obs)*100,digits=2),"% of records")) +
+		ggplot2::ggtitle(paste0("QQ plot: ",round((residuals_summary$nObs/n.obs)*100,digits=2),"% of records")) +
 		ggplot2::geom_abline(slope=1, intercept=0, color="gray70",size=1.15) +
 		ggplot2::geom_point(ggplot2::aes(x=expected,y=observed),color="blue") + 
 		# ggplot2::geom_smooth(ggplot2::aes(x=expected,y=observed),se=FALSE,span=smooth.span,size=0.25) + 
@@ -87,7 +87,7 @@ plot.dharma.resid = function(vast.output,n.samp=999999,seed=123,plot.type="all",
 
 
 	} else if(plot.type == "time"){
-		dt = data.table::data.table(factor = t_i,scaled.residual=d.all$scaledResiduals)
+		dt = data.table::data.table(factor = t_i,scaled.residual=residuals_summary$scaledResiduals)
 		u.factor = sort(unique(dt$factor))
 		n.factor = length(u.factor)
 		tmp.list = as.list(rep(NA,n.factor))
@@ -150,7 +150,7 @@ plot.dharma.resid = function(vast.output,n.samp=999999,seed=123,plot.type="all",
 
 	} else if(plot.type == "knot"){
 		dt = k_i
-		dt$scaled.residual = d.all$scaledResiduals
+		dt$scaled.residual = residuals_summary$scaledResiduals
 		colnames(dt)[1] = "factor"
 		u.factor = sort(unique(dt$factor))
 		n.factor = length(u.factor)
@@ -190,8 +190,8 @@ plot.dharma.resid = function(vast.output,n.samp=999999,seed=123,plot.type="all",
 		ggplot2::ylab("Observed") +
 		ggplot2::ggtitle("QQ plot by knots") +
 		ggplot2::geom_abline(slope=1, intercept=0, color="gray70",size=1.15) + ggplot2::facet_wrap(~factor.panel) +
-		# ggplot2::geom_point(ggplot2::aes(x=expected,y=observed,color=factor)) + 
-		ggplot2::geom_smooth(ggplot2::aes(x=expected,y=observed,group=factor,color=factor),se=FALSE,span=smooth.span,size=0.25) + 
+		ggplot2::geom_point(ggplot2::aes(x=expected,y=observed,color=factor)) + 
+		# ggplot2::geom_smooth(ggplot2::aes(x=expected,y=observed,group=factor,color=factor),se=FALSE,size=0.25) + 
 		ggplot2::scale_colour_gradientn(paste0("Factor type = ",plot.type),colors=palette.cols) + 
 		ggplot2::geom_text(size = 3,data = test.dt,mapping = ggplot2::aes(x = 0, y = 1, label = label),hjust=0,vjust=1)
 		ggplot2::ggsave(paste0(save.name,"-QQunif.space.png"),plot=g, device = "png", path = save.dir,scale = 1, width = 16, height = 9, units = c("in"))
@@ -203,14 +203,14 @@ plot.dharma.resid = function(vast.output,n.samp=999999,seed=123,plot.type="all",
 			tmp.dt = g.dt[factor == u.factor[i]]
 			tmp.ks = suppressWarnings(ks.test(tmp.dt$observed, 'punif', alternative = "two.sided"))
 			test.list[[i]] = data.table::data.table(factor.panel=u.factor[i],p.value=round(tmp.ks$p.value, digits = 3),deviation=ifelse(tmp.ks$p.value < 0.05, "significant", "n.s."))
-			test.list[[i]]$lon=vast.output$Spatial_List$latlon_x[u.factor[i],2]
-			test.list[[i]]$lat=vast.output$Spatial_List$latlon_x[u.factor[i],1]
+			test.list[[i]]$lon=vast_output$spatial_list$latlon_x[u.factor[i],2]
+			test.list[[i]]$lat=vast_output$spatial_list$latlon_x[u.factor[i],1]
 			rm(list=c("tmp.dt","tmp.ks"))
 		}
 		test.factor.dt = data.table::rbindlist(test.list) %>% .[lon<0,lon:=lon+360] %>% .[,deviation:=factor(deviation,levels=c("n.s.","significant"))]
 
 		data("coast")
-		data("wcpo.10N.shp")
+		data("swpo.swo.shp")
 		g2 = test.factor.dt %>% 
  		ggplot2::ggplot() + ggthemes::theme_few() +
 		ggplot2::xlab("Longitude") +
