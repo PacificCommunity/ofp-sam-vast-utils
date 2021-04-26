@@ -5,7 +5,8 @@
 \title{Plot DHARMa style residuals for VAST model.}
 \usage{
 plot.dharma.resid(
-  vast.output,
+  vast_output,
+  residuals_summary,
   n.samp = 999999,
   seed = 123,
   plot.type = "all",
@@ -20,7 +21,9 @@ plot.dharma.resid(
 )
 }
 \arguments{
-\item{vast.output}{The output from a fit.vast function call}
+\item{vast_output}{Output from a call to FishStatsUtils::fit_model}
+
+\item{residuals_summary}{Output from summary() applied to output from FishStatsUtils::fit_model when argument 'what' = "residuals"}
 
 \item{n.samp}{Integer giving the number of records to plot the QQ relationship. Default is to use everyting.}
 
