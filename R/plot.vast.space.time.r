@@ -41,6 +41,7 @@
 #' @importFrom ggplot2 xlab
 #' @importFrom ggplot2 ylab
 #' @importFrom ggplot2 ggtitle
+#' @importFrom ggplot2 scale_fill_gradientn
 #' @importFrom ggplot2 scale_fill_viridis_c
 #' @importFrom ggplot2 scale_fill_gradient2
 #' @importFrom ggplot2 facet_wrap
@@ -54,7 +55,7 @@
 #' @importFrom scales trans_new
 #' @importFrom scales extended_breaks
 
-plot.vast.space.time = function(vast_output,residuals_summary,coast.shp,region.shp.list,species="SWO",plot.type = "N",model.start.year=2004.25,t.block=2,plot.obs.grid=FALSE,x.extent=c(140, 250),y.extent=c(-50, 0),scale.trans="identity",virids.pal="D",save.dir,save.name)
+plot.vast.space.time = function(vast_output,residuals_summary,coast.shp,region.shp.list,species="SWO",plot.type = "N",model.start.year=2004.25,t.block=2,plot.obs.grid=FALSE,x.extent=c(140, 250),y.extent=c(-50, 0),scale.trans="identity",viridis.pal="D",save.dir,save.name)
 {
 
 	if(missing(region.shp.list))
@@ -231,9 +232,14 @@ plot.vast.space.time = function(vast_output,residuals_summary,coast.shp,region.s
 				ggplot2::geom_tile(ggplot2::aes(x=Lon,y=Lat,fill=metric)) + 
 				ggplot2::geom_point(data=obs.points,ggplot2::aes(Lon,Lat),shape=1,size=0.5,color="white") +
 				ggplot2::facet_wrap(~time.block,drop=FALSE) + 
-				ggplot2::scale_fill_viridis_c(legend.title,option=virids.pal,trans=scale.trans) +
 				ggplot2::geom_sf(data=sf::st_as_sf(coast.shp)) + ggplot2::geom_sf(data=sf::st_as_sf(region.shp.list),fill=NA) + 
 				ggplot2::coord_sf(xlim = x.extent, ylim = y.extent, expand = FALSE)
+				if (viridis.pal == "T")
+				{
+					g = g + ggplot2::scale_fill_gradientn(legend.title,colors=turbo_vec(max(c(length(unique(tmp.dt$metric))-1,100))),trans=scale.trans)
+				} else {
+					g = g + ggplot2::scale_fill_viridis_c(legend.title,option=viridis.pal,trans=scale.trans)
+				}
 			} else {
 				# trim tails function comes from
 				# https://stackoverflow.com/questions/44628130/ggplot2-dealing-with-extremes-values-by-setting-a-continuous-color-scale
@@ -281,9 +287,14 @@ plot.vast.space.time = function(vast_output,residuals_summary,coast.shp,region.s
 				ggplot2::ggtitle(paste0(species," ",plot.title)) +
 				ggplot2::geom_tile(ggplot2::aes(x=Lon,y=Lat,fill=metric)) + 
 				ggplot2::facet_wrap(~time.block,drop=FALSE) + 
-				ggplot2::scale_fill_viridis_c(legend.title,option=virids.pal,trans=scale.trans) +
 				ggplot2::geom_sf(data=sf::st_as_sf(coast.shp)) + ggplot2::geom_sf(data=sf::st_as_sf(region.shp.list),fill=NA) + 
 				ggplot2::coord_sf(xlim = x.extent, ylim = y.extent, expand = FALSE)
+				if (viridis.pal == "T")
+				{
+					g = g + ggplot2::scale_fill_gradientn(legend.title,colors=turbo_vec(max(c(length(unique(tmp.dt$metric))-1,100))),trans=scale.trans)
+				} else {
+					g = g + ggplot2::scale_fill_viridis_c(legend.title,option=viridis.pal,trans=scale.trans)
+				}
 			} else {
 				# trim tails function comes from
 				# https://stackoverflow.com/questions/44628130/ggplot2-dealing-with-extremes-values-by-setting-a-continuous-color-scale

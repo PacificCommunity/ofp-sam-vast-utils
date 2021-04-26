@@ -17,7 +17,7 @@ plot.vast.space.time(
   x.extent = c(140, 250),
   y.extent = c(-50, 0),
   scale.trans = "identity",
-  virids.pal = "D",
+  viridis.pal = "D",
   save.dir,
   save.name
 )
@@ -61,11 +61,11 @@ plot.vast.space.time(
 
 \item{scale.trans}{A character string denoting the type of ggplot2 scale transformation to use for the color scale. Built-in transformations include "asn", "atanh", "boxcox", "date", "exp", "hms", "identity", "log", "log10", "log1p", "log2", "logit", "modulus", "probability", "probit", "pseudo_log", "reciprocal", "reverse", "sqrt" and "time".}
 
+\item{viridis.pal}{A character string indicating the colormap option to use. Four options are available: "magma" (or "A"), "inferno" (or "B"), "plasma" (or "C"), "viridis" (or "D", the default option) and "cividis" (or "E")}
+
 \item{save.dir}{Path to the directory where the outputs will be saved}
 
 \item{save.name}{Name stem for the output, useful when saving many model outputs in the same directory}
-
-\item{viridis.pal}{A character string indicating the colormap option to use. Four options are available: "magma" (or "A"), "inferno" (or "B"), "plasma" (or "C"), "viridis" (or "D", the default option) and "cividis" (or "E")}
 }
 \description{
 Plot vast output by spatial knots and time block.
