@@ -2,7 +2,7 @@
 
 #' Plot Q-Q plot for aggregate model fit. Currently only available for delta-lognormal model.
 #' 
-#' @param vast.output The output from a fit.vast function call
+#' @param vast_output Output from a call to FishStatsUtils::fit_model
 #' @param error.structure Character string denoting the error structure used to fit the model. This is needed to calculate the correct quantiles for the residuals.
 #' @param nsims The number of random draws to use when calculating the quantiles. Default is 1000.
 #' @param save.dir Path to the directory where the outputs will be saved
@@ -12,7 +12,7 @@
 
 
 
-plot.qq.wrap = function(vast.output,error.structure="dln",nsims=1000,save.dir)
+plot.qq.wrap = function(vast_output,error.structure="dln",nsims=1000,save.dir)
 {	
 	if(!(error.structure %in% c("dln","dg")))
 	{
@@ -21,12 +21,12 @@ plot.qq.wrap = function(vast.output,error.structure="dln",nsims=1000,save.dir)
 
 	######################################################
 	# define internal functions
-		calc.qq.binom = function(vast.output)
+		calc.qq.binom = function(vast_output)
 		# modified from Laura Tremblay-Boyer code used in 2018 alb assessment 
 		{
 
-		    p = boot::inv.logit(vast.output$Report$P1_i)
-		    y = ifelse(vast.output$TmbData$b_i>0,1,0)
+		    p = boot::inv.logit(vast_output$Report$P1_iz)
+		    y = ifelse(vast_output$data_frame$b_i>0,1,0)
 		    n = rep(1, length(y)) ## assuming no prior weights
 
 		    y = n * y
@@ -37,12 +37,12 @@ plot.qq.wrap = function(vast.output,error.structure="dln",nsims=1000,save.dir)
 		    return(bino.res)
 		}
 
-		calc.qq.pos = function (vast.output, nsim=1000,error.structure)
+		calc.qq.pos = function (vast_output, nsim=1000,error.structure)
 		# modified from Laura Tremblay-Boyer code used in 2018 alb assessment
 		# Jim Thorson's FishStatsUtils::plot_quantile_diagnostic
 		{
-		    TmbData = vast.output$TmbData
-		    Report = vast.output$Report
+		    TmbData = vast_output$data_frame
+		    Report = vast_output$Report
 		    Which = which(TmbData$b_i > 0) ## index of positive sets
 
 		    pow = function(a, b){ a^b}
@@ -51,7 +51,7 @@ plot.qq.wrap = function(vast.output,error.structure="dln",nsims=1000,save.dir)
 		    y = array(NA, dim = c(length(Which), nsim))
 		    var_y = rep(NA, length(Which))
 		    ## get prediction of indiviuals caught (rate * area swept)
-		   		pred_y = exp(Report$P2_i[Which]) * TmbData$a_i[Which]
+		   		pred_y = exp(Report$P2_iz[Which]) * TmbData$a_i[Which]
 		   		if(error.structure == "dln")
 		   		{
 			        mean_y = log(pred_y) - pow(Report$SigmaM[1,1],2)/2 # corrected mean is log_exp - 0.5sigma^2
@@ -83,7 +83,7 @@ plot.qq.wrap = function(vast.output,error.structure="dln",nsims=1000,save.dir)
 		if(missing(save.dir))
 		{
     			par(mfrow=c(1,2), mar=c(4,5,1,1), las=1)
-	   			qq.bin = calc.qq.binom(vast.output)
+	   			qq.bin = calc.qq.binom(vast_output)
 	    		ab = qqnorm(qq.bin, plot.it=FALSE)
 		    	qqnorm(qq.bin, main='Encounter-rate component',col=scales::alpha('dodgerblue4',0.3),cex.axis=1.5,cex.lab=1.5)
 		   		q2get = c(0.001,0.01,0.025,0.975,0.99,0.999)
@@ -93,7 +93,7 @@ plot.qq.wrap = function(vast.output,error.structure="dln",nsims=1000,save.dir)
 	            text(q2p, pu[4]-0.15, q2get, offset=0.3, col='azure3', srt=90, pos=2, xpd=NA, cex=0.8)
 		    	qqline(qq.bin, col='grey50')
 		    	rm(list=c("ab","q2get","q2p","pu"))
-				pos.res = calc.qq.pos(vast.output,nsims,error.structure)
+				pos.res = calc.qq.pos(vast_output,nsims,error.structure)
 				ab = qqnorm(pos.res$stdres, plot.it=FALSE)
 				plot(ab$x, ab$y, type="n", col=scales::alpha('dodgerblue4',0.3), xlab='Theoretical quantiles', ylab='Sample quantiles', main='Positive catch-rate component',las=1,cex.axis=1.5,cex.lab=1.5)
 	   			qqline(pos.res$stdres, col='grey50')
@@ -107,7 +107,7 @@ plot.qq.wrap = function(vast.output,error.structure="dln",nsims=1000,save.dir)
 			if (! dir.exists(save.dir))dir.create(save.dir,recursive=TRUE)
 			    png(filename=paste0(save.dir,"qq.",error.structure,".png"),width = 9.5, height = 5.5, res=300 ,units = "in",  bg = "white", type = "windows")
     			par(mfrow=c(1,2), mar=c(4,5,1,1), las=1)
-	   			qq.bin = calc.qq.binom(vast.output)
+	   			qq.bin = calc.qq.binom(vast_output)
 	    		ab = qqnorm(qq.bin, plot.it=FALSE)
 		    	qqnorm(qq.bin, main='Encounter-rate component',col=scales::alpha('dodgerblue4',0.3),cex.axis=1.5,cex.lab=1.5)
 		   		q2get = c(0.001,0.01,0.025,0.975,0.99,0.999)
@@ -117,7 +117,7 @@ plot.qq.wrap = function(vast.output,error.structure="dln",nsims=1000,save.dir)
 	            text(q2p, pu[4]-0.15, q2get, offset=0.3, col='azure3', srt=90, pos=2, xpd=NA, cex=0.8)
 		    	qqline(qq.bin, col='grey50')
 		    	rm(list=c("ab","q2get","q2p","pu"))
-				pos.res = calc.qq.pos(vast.output,nsims,error.structure)
+				pos.res = calc.qq.pos(vast_output,nsims,error.structure)
 				ab = qqnorm(pos.res$stdres, plot.it=FALSE)
 				plot(ab$x, ab$y, type="n", col=scales::alpha('dodgerblue4',0.3), xlab='Theoretical quantiles', ylab='Sample quantiles', main='Positive catch-rate component',las=1,cex.axis=1.5,cex.lab=1.5)
 	   			qqline(pos.res$stdres, col='grey50')

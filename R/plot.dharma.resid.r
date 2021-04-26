@@ -218,7 +218,7 @@ plot.dharma.resid = function(vast_output,residuals_summary,n.samp=999999,seed=12
 		ggplot2::ggtitle("QQ residual uniformity by knot") +
 		ggplot2::geom_point(ggplot2::aes(x=lon,y=lat,color=deviation),size=2) + 
 		ggplot2::scale_color_manual("Deviation from uniform",values=c("black","red")) +
-		ggplot2::geom_sf(data=sf::st_as_sf(coast)) + ggplot2::geom_sf(data=sf::st_as_sf(wcpo.10N.shp),fill=NA) + ggplot2::coord_sf(xlim = c(95, 295), ylim = c(-50, 60), expand = FALSE) 
+		ggplot2::geom_sf(data=sf::st_as_sf(coast)) + ggplot2::geom_sf(data=sf::st_as_sf(swpo.swo.shp),fill=NA) + ggplot2::coord_sf(xlim = c(95, 295), ylim = c(-50, 60), expand = FALSE) 
  		ggplot2::ggsave(paste0(save.name,"-QQdev.space.png"),plot=g2, device = "png", path = save.dir,scale = 1, width = 16, height = 9, units = c("in"))
 
 

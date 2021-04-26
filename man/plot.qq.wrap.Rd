@@ -4,10 +4,10 @@
 \alias{plot.qq.wrap}
 \title{Plot Q-Q plot for aggregate model fit. Currently only available for delta-lognormal model.}
 \usage{
-plot.qq.wrap(vast.output, error.structure = "dln", nsims = 1000, save.dir)
+plot.qq.wrap(vast_output, error.structure = "dln", nsims = 1000, save.dir)
 }
 \arguments{
-\item{vast.output}{The output from a fit.vast function call}
+\item{vast_output}{Output from a call to FishStatsUtils::fit_model}
 
 \item{error.structure}{Character string denoting the error structure used to fit the model. This is needed to calculate the correct quantiles for the residuals.}
 
