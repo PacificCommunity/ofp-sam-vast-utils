@@ -68,6 +68,7 @@ Convert_LL_to_EastNorth_Fn.ndd = function(Lon, Lat, crs.en = "+proj=tpeqd +lat_1
 }
 
 #' # code to create "turbo" colormap
+#' All credit to those listed below; this is just a reposting of their work to utilize the colorscale within the package
 #' Better, shorter, more idiomatic, vectorized versions of the interpolate and turbo functions 
 #' thanks to user 'onesandzeroes'
 #' All credit to those listed below; this is just a reposting of their work to utilize the colorscale within the package

@@ -5,16 +5,17 @@
 \title{Plot vast output by spatial knots and time block.}
 \usage{
 plot.vast.space.time(
-  vast.output,
+  vast_output,
+  residuals_summary,
   coast.shp,
   region.shp.list,
-  species = "BET",
+  species = "SWO",
   plot.type = "N",
-  model.start.year = 1952,
-  t.block = 4,
+  model.start.year = 2004.25,
+  t.block = 2,
   plot.obs.grid = FALSE,
-  x.extent = c(95, 295),
-  y.extent = c(-50, 60),
+  x.extent = c(140, 250),
+  y.extent = c(-50, 0),
   scale.trans = "identity",
   virids.pal = "D",
   save.dir,
@@ -22,11 +23,13 @@ plot.vast.space.time(
 )
 }
 \arguments{
-\item{vast.output}{The output from a fit.vast function call}
+\item{vast_output}{Output from a call to FishStatsUtils::fit_model}
+
+\item{residuals_summary}{Output from summary() applied to output from FishStatsUtils::fit_model when argument 'what' = "residuals". Used to get PIT residuals}
 
 \item{coast.shp}{supply a coast shapefile, if missing this defaults to the coast shapefile stored in the package}
 
-\item{region.shp.list}{supply a shapefile with the regional structure, if missing this defaults to the WCPO 10N shapefile stored in the package}
+\item{region.shp.list}{supply a shapefile with the regional structure, if missing this defaults to the SWPO shapefile stored in the package}
 
 \item{species}{String denoting the species of the analysis}
 
@@ -46,7 +49,7 @@ plot.vast.space.time(
   \item{'Epsilon2'}{Spatiotemporal random effect for positive catch-rate}
 }}
 
-\item{model.start.year}{An integer denoting the first year of data used in the model}
+\item{model.start.year}{A numeric denoting the first year (or year-quarter) of data used in the model}
 
 \item{t.block}{An integer denoting the number of years to aggregate together in time blocks}
 

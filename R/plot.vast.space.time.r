@@ -2,9 +2,10 @@
 
 #' Plot vast output by spatial knots and time block.
 #' 
-#' @param vast.output The output from a fit.vast function call
+#' @param vast_output Output from a call to FishStatsUtils::fit_model
+#' @param residuals_summary Output from summary() applied to output from FishStatsUtils::fit_model when argument 'what' = "residuals". Used to get PIT residuals
 #' @param coast.shp supply a coast shapefile, if missing this defaults to the coast shapefile stored in the package
-#' @param region.shp.list supply a shapefile with the regional structure, if missing this defaults to the WCPO 10N shapefile stored in the package
+#' @param region.shp.list supply a shapefile with the regional structure, if missing this defaults to the SWPO shapefile stored in the package
 #' @param species String denoting the species of the analysis
 #' @param plot.type The type of metric to plot 'pred.cpue', 'bin', 'pos', 'resid', 'bin.resid', 'pos.resid', 'N', 'Omega1', 'Omega2','Epsilon1', or 'Epsilon2'
 #' \describe{
@@ -21,7 +22,7 @@
 #' 	 \item{'Epsilon1'}{Spatiotemporal random effect for encounter rate}
 #'   \item{'Epsilon2'}{Spatiotemporal random effect for positive catch-rate}
 #' }
-#' @param model.start.year An integer denoting the first year of data used in the model
+#' @param model.start.year A numeric denoting the first year (or year-quarter) of data used in the model
 #' @param t.block An integer denoting the number of years to aggregate together in time blocks
 #' @param plot.obs.grid TRUE or FALSE. Plot the observations. Default is FALSE as otherwise the plot looks gross
 #' @param x.extent Specify the xlim of the plot as c(xmin,xmax) in degrees 0 to 360
@@ -53,13 +54,13 @@
 #' @importFrom scales trans_new
 #' @importFrom scales extended_breaks
 
-plot.vast.space.time = function(vast.output,coast.shp,region.shp.list,species="BET",plot.type = "N",model.start.year=1952,t.block=4,plot.obs.grid=FALSE,x.extent=c(95, 295),y.extent=c(-50, 60),scale.trans="identity",virids.pal="D",save.dir,save.name)
+plot.vast.space.time = function(vast_output,residuals_summary,coast.shp,region.shp.list,species="SWO",plot.type = "N",model.start.year=2004.25,t.block=2,plot.obs.grid=FALSE,x.extent=c(140, 250),y.extent=c(-50, 0),scale.trans="identity",virids.pal="D",save.dir,save.name)
 {
 
 	if(missing(region.shp.list))
 	{
-		data("wcpo.10N.shp")
-		region.shp.list = wcpo.10N.shp
+		data("swpo.swo.shp")
+		region.shp.list = swpo.swo.shp
 	}
 
 	if(missing(coast.shp))
@@ -68,22 +69,33 @@ plot.vast.space.time = function(vast.output,coast.shp,region.shp.list,species="B
 		coast.shp = coast
 	}
 
+	if(missing(residuals_summary))
+	{
+		residuals_summary = NULL
+	}
+
+	# add functionality for fine_scale == TRUE/FALSE since this will change D_gct dimensions...
+	if(vast_output$spatial_list$fine_scale)
+	{
+		stop('This function has not developed the functionality to process output from a model where fine_scale is TRUE.')
+	}
+
 
 	# pull out quantities and make objects
-		Extrapolation_List = vast.output$Extrapolation_List
-		Spatial_List = vast.output$Spatial_List
-		TmbData = vast.output$TmbData
-		Report = vast.output$Report
-		D_xy = Report$D_gcy[,1,]
-		R1_xy = Report$R1_gcy[,1,]
-		R2_xy = Report$R2_gcy[,1,]
-		Epsilon1_xy = Report$Epsilon1_gc[,1,]
-		Epsilon2_xy = Report$Epsilon2_gc[,1,]
+		extrapolation_list = vast_output$extrapolation_list
+		spatial_list = vast_output$spatial_list
+		TmbData = vast_output$data_frame
+		Report = vast_output$Report
+		D_xy = Report$D_gct[,1,]
+		R1_xy = Report$R1_gct[,1,]
+		R2_xy = Report$R2_gct[,1,]
+		Epsilon1_xy = Report$Epsilon1_gct[,1,]
+		Epsilon2_xy = Report$Epsilon2_gct[,1,]
 
 	# recreate Data_Geostat
-		Data_Geostat = data.table::data.table(obs = TmbData$b_i, ts= as.vector(TmbData$t_iz)+1, knot = Spatial_List$knot_i, a_i = TmbData$a_i)
+		Data_Geostat = data.table::data.table(obs = TmbData$b_i, ts= as.vector(TmbData$t_i), knot = spatial_list$knot_i, a_i = TmbData$a_i)
 		colnames(Data_Geostat) = c("obs","ts","knot","a_i")
-		Data_Geostat = cbind(Data_Geostat,Convert_EN_to_LL_Fn.ndd(Spatial_List$loc_i[,"E_km"], Spatial_List$loc_i[,"N_km"], crs.en = attr(Spatial_List$loc_i, "projargs"), crs.ll = attr(Spatial_List$loc_i, "origargs")))
+		Data_Geostat = cbind(Data_Geostat,Convert_EN_to_LL_Fn.ndd(spatial_list$loc_i[,"E_km"], spatial_list$loc_i[,"N_km"], crs.en = attr(spatial_list$loc_i, "projargs"), crs.ll = attr(spatial_list$loc_i, "origargs")))
 
 	# add columns for yr.qtr, time.block
 		yr.qtr.seq = seq(from=model.start.year,length.out=max(Data_Geostat$ts),by=0.25)
@@ -93,16 +105,17 @@ plot.vast.space.time = function(vast.output,coast.shp,region.shp.list,species="B
 		Data_Geostat$qtr = ((Data_Geostat$yr.qtr %% 1)*4)+1
 		Data_Geostat$obs.bin = ifelse(Data_Geostat$obs>0,1,0)
 
-	if(length(vast.output$boot.pred)>1)
+	if(!is.null(residuals_summary))
 	{
-		Data_Geostat$pred.both = rowMeans(vast.output$boot.pred)
-		Data_Geostat$pred.bin = apply(vast.output$boot.pred,1,function(x)mean(ifelse(x==0,0,1)))
-		Data_Geostat$pred.pos = apply(vast.output$boot.pred,1,function(x)mean(ifelse(x==0,NA,x),na.rm=TRUE))
+		vast_output$boot.pred = residuals_summary$simulatedResponse
+		Data_Geostat$pred.both = rowMeans(vast_output$boot.pred)
+		Data_Geostat$pred.bin = apply(vast_output$boot.pred,1,function(x)mean(ifelse(x==0,0,1)))
+		Data_Geostat$pred.pos = apply(vast_output$boot.pred,1,function(x)mean(ifelse(x==0,NA,x),na.rm=TRUE))
 	}
 
 	# make extrapgrid.dt
-		extrapgrid.dt=data.table::as.data.table(Extrapolation_List$Data_Extrap[,1:3])
-		extrapgrid.dt$knot=as.vector(Spatial_List$NN_Extrap$nn.idx)
+		extrapgrid.dt=data.table::as.data.table(extrapolation_list$Data_Extrap[,1:3])
+		extrapgrid.dt$knot=as.vector(spatial_list$NN_Extrap$nn.idx)
 
 	# create dt by plot type
 		if(plot.type == "obs.cpue")
@@ -132,7 +145,7 @@ plot.vast.space.time = function(vast.output,coast.shp,region.shp.list,species="B
 		}else if(plot.type == "resid"){
 			Data_Geostat$knot.pred = sapply(1:nrow(Data_Geostat),function(x)D_xy[Data_Geostat$knot[x],Data_Geostat$ts[x]])
 			Data_Geostat$pred.density = Data_Geostat$knot.pred*Data_Geostat$a_i
-			if(length(vast.output$boot.pred)>1)
+			if(length(vast_output$boot.pred)>1)
 			{
 				dg = Data_Geostat[,.(metric=mean(obs-pred.both)),by=.(time.block,knot)][order(time.block,knot)]
 				dg$metric = dg$metric/sd(dg$metric,na.rm=TRUE)
@@ -144,7 +157,7 @@ plot.vast.space.time = function(vast.output,coast.shp,region.shp.list,species="B
 			legend.title = "Std. Residual (Obs - Pred)"
 		}else if(plot.type == "bin.resid"){
 			Data_Geostat$knot.bin = sapply(1:nrow(Data_Geostat),function(x)R1_xy[Data_Geostat$knot[x],Data_Geostat$ts[x]])
-			if(length(vast.output$boot.pred)>1)
+			if(length(vast_output$boot.pred)>1)
 			{
 				dg = Data_Geostat[,.(metric=mean(obs.bin-pred.bin)),by=.(time.block,knot)][order(time.block,knot)]
 				dg$metric = dg$metric/sd(dg$metric,na.rm=TRUE)
@@ -157,7 +170,7 @@ plot.vast.space.time = function(vast.output,coast.shp,region.shp.list,species="B
 		}else if(plot.type == "pos.resid"){
 			Data_Geostat$knot.pos = sapply(1:nrow(Data_Geostat),function(x)R2_xy[Data_Geostat$knot[x],Data_Geostat$ts[x]])
 			Data_Geostat$pos.density = Data_Geostat$knot.pos*Data_Geostat$a_i
-			if(length(vast.output$boot.pred)>1)
+			if(length(vast_output$boot.pred)>1)
 			{
 				dg = Data_Geostat[obs.bin==1,.(metric=mean(obs-pred.pos)),by=.(time.block,knot)][order(time.block,knot)]
 				dg$metric = dg$metric/sd(dg$metric,na.rm=TRUE)
