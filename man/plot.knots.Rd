@@ -2,12 +2,12 @@
 % Please edit documentation in R/plot.knots.r
 \name{plot.knots}
 \alias{plot.knots}
-\title{Given fit.vast output, plot the knots and regional structure}
+\title{Given fit_vast output, plot the knots and regional structure}
 \usage{
-plot.knots(vast.output, coast.shp, region.shp.list, save.dir)
+plot.knots(vast_output, coast.shp, region.shp.list, save.dir)
 }
 \arguments{
-\item{vast.output}{Output from the fit.vast function where slim output is FALSE}
+\item{vast_output}{Output from a call to FishStatsUtils::fit_model}
 
 \item{coast.shp}{supply a coast shapefile, if missing this defaults to the coast shapefile stored in the package}
 
@@ -16,5 +16,5 @@ plot.knots(vast.output, coast.shp, region.shp.list, save.dir)
 \item{save.dir}{directory with the location of where to save the plot}
 }
 \description{
-Given fit.vast output, plot the knots and regional structure
+Given fit_vast output, plot the knots and regional structure
 }

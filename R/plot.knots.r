@@ -1,7 +1,7 @@
 
-#' Given fit.vast output, plot the knots and regional structure
+#' Given fit_vast output, plot the knots and regional structure
 #' 
-#' @param vast.output Output from the fit.vast function where slim output is FALSE
+#' @param vast_output Output from a call to FishStatsUtils::fit_model
 #' @param coast.shp supply a coast shapefile, if missing this defaults to the coast shapefile stored in the package
 #' @param region.shp.list supply a shapefile with the regional structure, if missing this defaults to the WCPO 10N shapefile stored in the package
 #' @param save.dir directory with the location of where to save the plot
@@ -17,12 +17,12 @@
 #' @importFrom raster extent
 #' @importFrom scales alpha
 
-plot.knots = function(vast.output,coast.shp,region.shp.list,save.dir)
+plot.knots = function(vast_output,coast.shp,region.shp.list,save.dir)
 {
 	if(missing(region.shp.list))
 	{
-		data("wcpo.10N.shp")
-		region.shp.list = wcpo.10N.shp
+		data("swpo.swo.shp")
+		region.shp.list = swpo.swo.shp
 	}
 
 	if(missing(coast.shp))
@@ -31,20 +31,26 @@ plot.knots = function(vast.output,coast.shp,region.shp.list,save.dir)
 		coast.shp = coast
 	}
 
+	# add functionality for fine_scale == TRUE/FALSE since this will change D_gct dimensions...
+	if(vast_output$spatial_list$fine_scale)
+	{
+		stop('This function has not developed the functionality to process output from a model where fine_scale is TRUE.')
+	}
+
 	# pull out quantities and make objects
-		Extrapolation_List = vast.output$Extrapolation_List
-		Spatial_List = vast.output$Spatial_List
-		TmbData = vast.output$TmbData
+		extrapolation_list = vast_output$extrapolation_list
+		spatial_list = vast_output$spatial_list
+		TmbData = vast_output$data_frame
 
 	# recreate Data_Geostat
-		Data_Geostat = data.table::data.table(obs = TmbData$b_i, ts= as.vector(TmbData$t_iz)+1, knot = Spatial_List$knot_i, a_i = TmbData$a_i)
+		Data_Geostat = data.table::data.table(obs = TmbData$b_i, ts= as.vector(TmbData$t_i), knot = spatial_list$knot_i, a_i = TmbData$a_i)
 		colnames(Data_Geostat) = c("obs","ts","knot","a_i")
-		Data_Geostat = cbind(Data_Geostat,Convert_EN_to_LL_Fn.ndd(Spatial_List$loc_i[,"E_km"], Spatial_List$loc_i[,"N_km"], crs.en = attr(Spatial_List$loc_i, "projargs"), crs.ll = attr(Spatial_List$loc_i, "origargs")))
+		Data_Geostat = cbind(Data_Geostat,Convert_EN_to_LL_Fn.ndd(spatial_list$loc_i[,"E_km"], spatial_list$loc_i[,"N_km"], crs.en = attr(spatial_list$loc_i, "projargs"), crs.ll = attr(spatial_list$loc_i, "origargs")))
 		Data_Geostat = as.data.frame(Data_Geostat)
 		color.palette=c("#017cdf","#db00ab","#00b4bb","#ec6900","#b74f66","#738a38")
-		spatial.agg.df = as.data.frame(Extrapolation_List$Data_Extrap)
-				spatial.agg.df$knot_i = Spatial_List$PolygonList$NN_Extrap$nn.idx[,1]
-				ll_to_EN = Convert_LL_to_EastNorth_Fn.ndd( Lon=Data_Geostat[,'Lon'], Lat=Data_Geostat[,'Lat'],crs.en = attr(Spatial_List$loc_i, "projargs"), crs.ll = attr(Spatial_List$loc_i, "origargs"))
+		spatial.agg.df = as.data.frame(extrapolation_list$Data_Extrap)
+				spatial.agg.df$knot_i = spatial_list$PolygonList$NN_Extrap$nn.idx[,1]
+				ll_to_EN = Convert_LL_to_EastNorth_Fn.ndd( Lon=Data_Geostat[,'Lon'], Lat=Data_Geostat[,'Lat'],crs.en = attr(spatial_list$loc_i, "projargs"), crs.ll = attr(spatial_list$loc_i, "origargs"))
 
 
 				# create adjacency matrix from extrapolation grid
@@ -59,7 +65,7 @@ plot.knots = function(vast.output,coast.shp,region.shp.list,save.dir)
 			      		spat.agg.ras = raster::raster(spat.agg.df.dup)
 			      		raster::crs(spat.agg.ras) = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0"
 			      	# create key to map back and forth between extrap.df rows and raster cells	
-			      		spat.agg.index.key = spat.agg.ras[1:raster::ncell(spat.agg.ras)]  # this vector gives the row index of Extrapolation_List$Data_Extrap that corresponds with each raster cell
+			      		spat.agg.index.key = spat.agg.ras[1:raster::ncell(spat.agg.ras)]  # this vector gives the row index of extrapolation_list$Data_Extrap that corresponds with each raster cell
 			      		# i.e. spat.agg.index.key[1] = 10542 which means that raster cell 1 corresponds to spat.agg.ras row 10542
 			      	# assign knot membership to raster
 			      		spat.agg.ras[1:raster::ncell(spat.agg.ras)] = spatial.agg.df$knot_i[spat.agg.index.key]
@@ -105,9 +111,9 @@ plot.knots = function(vast.output,coast.shp,region.shp.list,save.dir)
 
 
 			obs.loc = Data_Geostat[,c('Lon','Lat')]
-			knot.loc = Convert_EN_to_LL_Fn.ndd(Spatial_List$loc_x[,1],Spatial_List$loc_x[,2], crs.en = attr(Spatial_List$loc_i, "projargs"), crs.ll = attr(Spatial_List$loc_i, "origargs"))
+			knot.loc = Convert_EN_to_LL_Fn.ndd(spatial_list$loc_x[,1],spatial_list$loc_x[,2], crs.en = attr(spatial_list$loc_i, "projargs"), crs.ll = attr(spatial_list$loc_i, "origargs"))
 			points.to.plot = obs.loc
-			points.to.plot.cols = col.vec[Spatial_List$knot_i]
+			points.to.plot.cols = col.vec[spatial_list$knot_i]
 	
 	# main plotting
 		# define plotting window
