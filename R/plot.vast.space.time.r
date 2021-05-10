@@ -23,6 +23,7 @@
 #'   \item{'Epsilon2'}{Spatiotemporal random effect for positive catch-rate}
 #' }
 #' @param model.start.year A numeric denoting the first year (or year-quarter) of data used in the model
+#' @param model.int A numeric denoting the interval used for the temporal sequence
 #' @param t.block An integer denoting the number of years to aggregate together in time blocks
 #' @param plot.obs.grid TRUE or FALSE. Plot the observations. Default is FALSE as otherwise the plot looks gross
 #' @param x.extent Specify the xlim of the plot as c(xmin,xmax) in degrees 0 to 360
@@ -55,7 +56,7 @@
 #' @importFrom scales trans_new
 #' @importFrom scales extended_breaks
 
-plot.vast.space.time = function(vast_output,residuals_summary,coast.shp,region.shp.list,species="SWO",plot.type = "N",model.start.year=2004.25,t.block=2,plot.obs.grid=FALSE,x.extent=c(140, 250),y.extent=c(-50, 0),scale.trans="identity",viridis.pal="D",save.dir,save.name)
+plot.vast.space.time = function(vast_output,residuals_summary,coast.shp,region.shp.list,species="SWO",plot.type = "N",model.start.year=2004.25,model.int=0.25,t.block=2,plot.obs.grid=FALSE,x.extent=c(140, 250),y.extent=c(-50, 0),scale.trans="identity",viridis.pal="D",save.dir,save.name)
 {
 
 	if(missing(region.shp.list))
@@ -99,7 +100,7 @@ plot.vast.space.time = function(vast_output,residuals_summary,coast.shp,region.s
 		Data_Geostat = cbind(Data_Geostat,Convert_EN_to_LL_Fn.ndd(spatial_list$loc_i[,"E_km"], spatial_list$loc_i[,"N_km"], crs.en = attr(spatial_list$loc_i, "projargs"), crs.ll = attr(spatial_list$loc_i, "origargs")))
 
 	# add columns for yr.qtr, time.block
-		yr.qtr.seq = seq(from=model.start.year,length.out=max(Data_Geostat$ts),by=0.25)
+		yr.qtr.seq = seq(from=model.start.year,length.out=max(Data_Geostat$ts),by=model.int)
 		time.block.seq = as.numeric(unique(floor(yr.qtr.seq/t.block)*t.block))
 		Data_Geostat$yr.qtr = yr.qtr.seq[Data_Geostat$ts]
 		Data_Geostat$time.block = floor(Data_Geostat$yr.qtr/t.block)*t.block

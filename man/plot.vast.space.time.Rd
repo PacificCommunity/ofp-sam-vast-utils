@@ -12,6 +12,7 @@ plot.vast.space.time(
   species = "SWO",
   plot.type = "N",
   model.start.year = 2004.25,
+  model.int = 0.25,
   t.block = 2,
   plot.obs.grid = FALSE,
   x.extent = c(140, 250),
@@ -50,6 +51,8 @@ plot.vast.space.time(
 }}
 
 \item{model.start.year}{A numeric denoting the first year (or year-quarter) of data used in the model}
+
+\item{model.int}{A numeric denoting the interval used for the temporal sequence}
 
 \item{t.block}{An integer denoting the number of years to aggregate together in time blocks}
 
